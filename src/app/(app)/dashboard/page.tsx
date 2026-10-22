@@ -3,24 +3,33 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { SessionDialog } from "@/components/session-dialog";
+import { GoalsCard } from "@/components/goals-card";
 import { SessionRow } from "@/components/session-row";
 import { StudyTimer } from "@/components/study-timer";
 import { Button } from "@/components/ui/button";
+import { getPlannerSettings } from "@/lib/data/planner";
 import { getSessionLite, getSubjects, listSessions } from "@/lib/data/queries";
+import { computeGoalProgress } from "@/lib/goals";
+import { createClient } from "@/lib/supabase/server";
 import { summarize, totalsBySubject } from "@/lib/stats";
 import { formatMinutes, monthRange, todayISO, weekRange } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
-  const [subjects, rows, recent] = await Promise.all([
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const [subjects, rows, recent, planner] = await Promise.all([
     getSubjects(),
     getSessionLite(),
     listSessions({ limit: 6 }),
+    getPlannerSettings(),
   ]);
 
   const s = summarize(rows, todayISO(), weekRange(), monthRange());
   const totals = totalsBySubject(rows);
+  const goals = { daily: planner.dailyGoalMinutes, weekly: planner.weeklyGoalMinutes, targets: planner.weeklyTargets };
+  const goalProgress = computeGoalProgress(rows, goals, todayISO(), weekRange());
   const breakdown = subjects
     .map((sub) => ({ sub, ...(totals.get(sub.id) ?? { minutes: 0, count: 0 }) }))
     .filter((r) => r.minutes > 0)
@@ -45,7 +54,7 @@ export default async function DashboardPage() {
         }
       />
 
-      <StudyTimer subjects={subjects.filter((x) => !x.is_archived)} />
+      <StudyTimer subjects={subjects} userId={user?.id ?? ""} />
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map((st) => (
@@ -55,6 +64,8 @@ export default async function DashboardPage() {
           </div>
         ))}
       </dl>
+
+      <GoalsCard goals={goals} progress={goalProgress} subjects={subjects} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="recent-h" className="rounded-lg border bg-card shadow-xs">

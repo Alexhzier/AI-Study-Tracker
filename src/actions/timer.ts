@@ -3,49 +3,50 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { toLocalDateISO } from "@/lib/time";
-import type { ActionResult } from "@/lib/types";
+import { APP_TZ } from "@/lib/time";
+import { normalizeTimer, type TimerResult } from "@/lib/timer";
 
-const schema = z.object({
-  subject_id: z.string().uuid("Choose a subject."),
-  started_at: z.number().int().positive(),
-  ended_at: z.number().int().positive(),
-  duration_minutes: z.number().int().min(1, "Study at least one minute to save.").max(1440, "A single session can't exceed 24 hours."),
-  notes: z.string().trim().max(2000, "Notes can be up to 2,000 characters.").optional(),
-});
+const MESSAGES: Record<string, string> = {
+  subject_unavailable: "That subject is archived or no longer exists.",
+  timer_exists: "A timer is already active, possibly on another device. Showing it now.",
+  invalid_state: "The timer was changed on another device. Showing its latest state.",
+  no_timer: "There's no active timer.",
+  not_stopped: "Stop the timer before saving.",
+  too_short: "Study at least one minute to save.",
+  too_long: "A single session can't exceed 24 hours.",
+};
 
-/**
- * Saves a finished timer run. duration_minutes is the *active* time (pauses excluded),
- * so it can be shorter than ended_at - started_at.
- */
-export async function saveTimerSession(input: z.input<typeof schema>): Promise<ActionResult> {
-  const parsed = schema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const { subject_id, started_at, ended_at, duration_minutes, notes } = parsed.data;
+function friendly(message: string) {
+  for (const [key, text] of Object.entries(MESSAGES)) if (message.includes(key)) return text;
+  return "Something went wrong. Try again.";
+}
 
-  const elapsedMin = (ended_at - started_at) / 60000;
-  if (ended_at <= started_at) return { error: "The timer's end time is before its start time." };
-  if (ended_at > Date.now() + 60_000) return { error: "The timer's end time is in the future. Check your device clock." };
-  if (duration_minutes > elapsedMin + 1) return { error: "Studied time can't exceed the time between start and stop." };
-
+async function run(fn: string, args?: Record<string, unknown>, revalidate = false): Promise<TimerResult> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Your session expired. Sign in again." };
 
-  const { data: subject } = await supabase.from("subjects").select("id,is_archived").eq("id", subject_id).maybeSingle();
-  if (!subject) return { error: "That subject no longer exists. Discard this session or log it manually." };
-  if (subject.is_archived) return { error: "That subject is archived. Restore it, then save." };
+  const { data, error } = await supabase.rpc(fn, args);
+  if (error) {
+    console.error(`${fn} failed:`, error.message);
+    return { error: friendly(error.message) };
+  }
+  if (revalidate) revalidatePath("/", "layout");
+  return { timer: normalizeTimer(data?.timer), serverNow: Number(data?.server_now) || undefined };
+}
 
-  const { error } = await supabase.from("study_sessions").insert({
-    subject_id,
-    session_date: toLocalDateISO(started_at),
-    started_at: new Date(started_at).toISOString(),
-    ended_at: new Date(ended_at).toISOString(),
-    duration_minutes,
-    notes: notes || null,
-  });
-  if (error) return { error: "Couldn't save the session. Your timer is kept, so try again." };
+export async function timerStart(subjectId: string): Promise<TimerResult> {
+  if (!z.string().uuid().safeParse(subjectId).success) return { error: "Choose a subject." };
+  return run("timer_start", { p_subject_id: subjectId });
+}
+export async function timerPause() { return run("timer_pause"); }
+export async function timerResume() { return run("timer_resume"); }
+export async function timerStop() { return run("timer_stop"); }
+export async function timerDiscard() { return run("timer_discard"); }
 
-  revalidatePath("/", "layout");
-  return {};
+export async function timerSave(notes?: string): Promise<TimerResult> {
+  const parsed = z.string().trim().max(2000, "Notes can be up to 2,000 characters.").optional().safeParse(notes);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  // Saving creates a session, so dashboard, calendar and analytics must refresh.
+  return run("timer_save", { p_notes: parsed.data ?? null, p_timezone: APP_TZ }, true);
 }
