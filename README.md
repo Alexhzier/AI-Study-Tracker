@@ -36,3 +36,4 @@ local calendar date; all today / week / month ranges are computed via `src/lib/t
 - [x] Stage 1: structure, auth, protected routes, migrations, theme, shell
 - [x] Stage 2: subjects, sessions CRUD, dashboard, calendar
 - [x] Stage 3: timer, analytics
+- [ ] Stage 4: AI implementation(AI Adaptive Study Planner, AI Learning Assistant, AI Quiz Generator, AI Study Insights, AI Natural Language Logging)
