@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Palette: chalk paper, slate ink, a single deep-teal accent (and its heatmap ramp). */
+:root {
+  --radius: 0.5rem;
+  --background: #f7f7f5;
+  --foreground: #1d2227;
+  --card: #ffffff;
+  --card-foreground: #1d2227;
+  --popover: #ffffff;
+  --popover-foreground: #1d2227;
+  --primary: #2f6f6a;
+  --primary-foreground: #f4faf9;
+  --secondary: #eeeeea;
+  --secondary-foreground: #1d2227;
+  --muted: #eeeeea;
+  --muted-foreground: #646b73;
+  --accent: #e7efee;
+  --accent-foreground: #1f4b47;
+  --destructive: #b3372f;
+  --border: #e2e2dd;
+  --input: #d6d6d0;
+  --ring: #2f6f6a;
+  --heat-1: #dcebe9;
+  --heat-2: #b4d6d2;
+  --heat-3: #7fb6b0;
+  --heat-4: #4a928b;
+}
+
+.dark {
+  --background: #14171a;
+  --foreground: #e8e9e6;
+  --card: #1b1f23;
+  --card-foreground: #e8e9e6;
+  --popover: #1b1f23;
+  --popover-foreground: #e8e9e6;
+  --primary: #5fb0a8;
+  --primary-foreground: #0f1b1a;
+  --secondary: #242a2e;
+  --secondary-foreground: #e8e9e6;
+  --muted: #242a2e;
+  --muted-foreground: #959ca3;
+  --accent: #1f2d2c;
+  --accent-foreground: #b4d6d2;
+  --destructive: #e0675e;
+  --border: #2a3035;
+  --input: #343b41;
+  --ring: #5fb0a8;
+  --heat-1: #1f3331;
+  --heat-2: #2a4d49;
+  --heat-3: #3a706a;
+  --heat-4: #5fb0a8;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-heat-1: var(--heat-1);
+  --color-heat-2: var(--heat-2);
+  --color-heat-3: var(--heat-3);
+  --color-heat-4: var(--heat-4);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground antialiased; font-feature-settings: "tnum" 1, "cv11" 1; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
