@@ -17,6 +17,10 @@ export function aiConfig() {
     model: model ?? "",
     /** Plan generations allowed per user in any rolling 24 hours. */
     dailyLimit: int(process.env.AI_DAILY_PLAN_LIMIT, 5, 1, 100),
+    /** Plans each demo guest may generate in 24 hours. */
+    guestLimit: int(process.env.AI_GUEST_PLAN_LIMIT, 2, 1, 20),
+    /** Plans ALL demo guests together may generate in 24 hours. */
+    guestGlobalLimit: int(process.env.AI_GUEST_GLOBAL_DAILY_LIMIT, 30, 1, 1000),
     /** Minimum seconds between two generations. */
     cooldownSeconds: int(process.env.AI_COOLDOWN_SECONDS, 20, 0, 3600),
     /** Hard cap on tokens the model may produce (reasoning models count thinking tokens too). */

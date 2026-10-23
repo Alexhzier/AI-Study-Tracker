@@ -39,6 +39,16 @@ subjects, plannable dates, daily availability and the weekly goal. Usage is mete
 Postgres (`ai_usage`) with a daily limit and a cooldown. Set a monthly spend limit in your OpenAI
 dashboard as the global backstop.
 
+## Portfolio demo
+Visitors can click **Try the live demo** on the landing page. That signs them in as a temporary
+guest (Supabase anonymous sign-in) and seeds sample subjects, sessions, goals, an exam and a
+sample plan. Each guest is isolated by Row Level Security.
+
+Setup: turn on *Allow anonymous sign-ins* in Supabase, run `20260105000000_demo_mode.sql`,
+and keep the Vercel cron in `vercel.json`. Guests are deleted after about two days by a
+`pg_cron` job (`cleanup_demo_users`). Guest AI use is capped per guest and in total
+(`AI_GUEST_PLAN_LIMIT`, `AI_GUEST_GLOBAL_DAILY_LIMIT`).
+
 ## Timezone
 `NEXT_PUBLIC_APP_TIMEZONE` (default `Asia/Manila`). `study_sessions.session_date` stores the
 local calendar date; all today / week / month ranges are computed via `src/lib/time.ts`.
@@ -50,3 +60,5 @@ local calendar date; all today / week / month ranges are computed via `src/lib/t
 - [x] Stage 4: AI study planner
 - [x] Stage 5: study goals (apply `20260103000000_goals.sql`)
 - [x] Stage 6: timer across devices (apply `20260104000000_timer_sync.sql`)
+
+- [x] Stage 7: portfolio demo mode

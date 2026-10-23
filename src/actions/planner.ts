@@ -59,13 +59,17 @@ export async function generatePlan(week: "this" | "next"): Promise<GenerateResul
 
   let usageId: string;
   try {
-    usageId = await reserveUsage(supabase, cfg);
+    usageId = await reserveUsage(supabase, cfg, Boolean(user.is_anonymous));
   } catch (e) {
     if (e instanceof UsageLimitError) {
+      const limit = user.is_anonymous ? cfg.guestLimit : cfg.dailyLimit;
       return {
-        error: e.reason === "daily"
-          ? `You've used all ${cfg.dailyLimit} AI plans for the last 24 hours. Try again later, or build a plan by hand.`
-          : `Please wait ${cfg.cooldownSeconds} seconds between plans.`,
+        error:
+          e.reason === "daily"
+            ? `You've used all ${limit} AI plans for the last 24 hours. Try again later, or build a plan by hand.`
+            : e.reason === "global"
+              ? "The demo's AI allowance for today has been used up. Please try again tomorrow."
+              : `Please wait ${cfg.cooldownSeconds} seconds between plans.`,
       };
     }
     console.error("ai usage reserve failed:", e instanceof Error ? e.message : e);

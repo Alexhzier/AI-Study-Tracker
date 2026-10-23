@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { APP_TZ } from "@/lib/time";
 
 export type AuthState = { error?: string } | undefined;
 
@@ -37,4 +38,23 @@ export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+/** Creates a temporary guest account with sample data so visitors can try the app. */
+export async function startDemo(_: AuthState): Promise<AuthState> {
+  const supabase = await createClient();
+  const { data: { user: existing } } = await supabase.auth.getUser();
+  if (existing) redirect("/dashboard");
+
+  const { error } = await supabase.auth.signInAnonymously();
+  if (error) {
+    console.error("demo sign-in failed:", error.message);
+    return { error: "The demo isn't available right now. Please try again later." };
+  }
+  const { error: seedError } = await supabase.rpc("seed_demo_data", { p_timezone: APP_TZ });
+  if (seedError) {
+    console.error("demo seed failed:", seedError.message);
+    return { error: "Couldn't prepare the demo data. Please try again." };
+  }
+  redirect("/dashboard");
 }

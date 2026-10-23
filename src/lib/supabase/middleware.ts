@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/register"];
+const AUTH_PAGES = ["/login", "/register"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -24,14 +24,16 @@ export async function updateSession(request: NextRequest) {
   // getUser() validates the JWT with Supabase; never trust getSession() on the server.
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
+  const isAuthPage = AUTH_PAGES.some((p) => path.startsWith(p));
+  const isPublic = path === "/" || isAuthPage || path.startsWith("/api/keepalive");
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-  if (user && (isPublic || path === "/")) {
+  // Signed-in members skip the auth pages. Demo guests may still open them to create a real account.
+  if (user && !user.is_anonymous && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

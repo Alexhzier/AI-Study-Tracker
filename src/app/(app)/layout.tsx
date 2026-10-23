@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { logout } from "@/actions/auth";
@@ -16,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <p className="px-3 py-2 text-base font-semibold tracking-tight">Study Tracker</p>
         <div className="mt-4"><AppNav variant="sidebar" /></div>
         <div className="mt-auto space-y-2 border-t pt-3">
-          <p className="truncate px-3 text-xs text-muted-foreground">{user.email}</p>
+          <p className="truncate px-3 text-xs text-muted-foreground">{user.email ?? "Demo visitor"}</p>
           <div className="flex items-center justify-between px-1">
             <form action={logout}>
               <button className="inline-flex h-8 items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
@@ -40,6 +41,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </form>
           </div>
         </header>
+        {user.is_anonymous && (
+          <div role="status" className="border-b bg-accent px-4 py-2 text-center text-xs text-accent-foreground">
+            You&rsquo;re in demo mode with sample data, deleted automatically after about two days.{" "}
+            <Link href="/register" className="font-medium underline underline-offset-4">Create a free account</Link>
+          </div>
+        )}
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 md:px-8 md:py-10">{children}</main>
       </div>
 

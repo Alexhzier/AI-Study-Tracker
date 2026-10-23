@@ -25,6 +25,7 @@ export default async function PlannerPage() {
   const cfg = aiConfig();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const isGuest = Boolean(user?.is_anonymous);
   const thisWeek = weekStartISO(todayISO());
   const nextWeek = format(addWeeks(parseISO(thisWeek), 1), "yyyy-MM-dd");
 
@@ -32,7 +33,7 @@ export default async function PlannerPage() {
     getSubjects(),
     getPlannerSettings(),
     getApprovedPlans([thisWeek, nextWeek]),
-    cfg.enabled ? remainingGenerations(supabase, cfg) : Promise.resolve(0),
+    cfg.enabled ? remainingGenerations(supabase, cfg, isGuest) : Promise.resolve(0),
   ]);
 
   const weeks: WeekOption[] = [
@@ -56,7 +57,7 @@ export default async function PlannerPage() {
         weeks={weeks}
         enabled={cfg.enabled}
         remaining={remaining}
-        limit={cfg.dailyLimit}
+        limit={isGuest ? cfg.guestLimit : cfg.dailyLimit}
         hasAvailability={Object.keys(settings.availability).length > 0}
         userId={user?.id ?? "anonymous"}
       />

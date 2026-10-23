@@ -6,21 +6,23 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 type Cfg = ReturnType<typeof aiConfig>;
 
 export class UsageLimitError extends Error {
-  constructor(public reason: "daily" | "cooldown") {
+  constructor(public reason: "daily" | "cooldown" | "global") {
     super(reason);
   }
 }
 
 /** Reserves one generation (atomically, in the database) before any model call is made. */
-export async function reserveUsage(supabase: Supabase, cfg: Cfg): Promise<string> {
+export async function reserveUsage(supabase: Supabase, cfg: Cfg, isGuest = false): Promise<string> {
   const { data, error } = await supabase.rpc("ai_reserve_usage", {
     p_kind: "plan",
     p_model: cfg.model,
-    p_daily_limit: cfg.dailyLimit,
+    p_daily_limit: isGuest ? cfg.guestLimit : cfg.dailyLimit,
     p_cooldown_seconds: cfg.cooldownSeconds,
+    p_guest_global_limit: isGuest ? cfg.guestGlobalLimit : null,
   });
   if (error) {
     if (error.message.includes("daily_limit")) throw new UsageLimitError("daily");
+    if (error.message.includes("global_limit")) throw new UsageLimitError("global");
     if (error.message.includes("cooldown")) throw new UsageLimitError("cooldown");
     throw new Error(error.message);
   }
@@ -42,12 +44,12 @@ export async function finishUsage(
 }
 
 /** Generations left in the rolling 24 hours (failed attempts don't count). */
-export async function remainingGenerations(supabase: Supabase, cfg: Cfg) {
+export async function remainingGenerations(supabase: Supabase, cfg: Cfg, isGuest = false) {
   const { count } = await supabase
     .from("ai_usage")
     .select("id", { count: "exact", head: true })
     .eq("kind", "plan")
     .neq("status", "failed")
     .gte("created_at", subDays(new Date(), 1).toISOString());
-  return Math.max(0, cfg.dailyLimit - (count ?? 0));
+  return Math.max(0, (isGuest ? cfg.guestLimit : cfg.dailyLimit) - (count ?? 0));
 }
