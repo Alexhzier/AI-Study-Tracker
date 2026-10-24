@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ExamsManager } from "@/components/exams-manager";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { PlannerSettingsForm } from "@/components/planner-settings-form";
 import { getExams, getPlannerSettings } from "@/lib/data/planner";
@@ -13,13 +14,13 @@ export default async function PlannerSettingsPage() {
   const active = subjects.filter((s) => !s.is_archived);
 
   return (
-    <>
+    <PageContainer size="narrow">
       <PageHeader
         title="Planner settings"
         description="The planner only uses what you enter here and what you've logged. It never guesses exam dates."
         action={<Link href="/planner" className="text-sm text-muted-foreground underline-offset-4 hover:underline">Back to planner</Link>}
       />
-      <div className="max-w-2xl space-y-10">
+      <div className="space-y-10">
         <PlannerSettingsForm
           weeklyGoalMinutes={settings.weeklyGoalMinutes}
           availability={settings.availability}
@@ -30,6 +31,6 @@ export default async function PlannerSettingsPage() {
           <ExamsManager exams={exams} subjects={subjects} />
         </section>
       </div>
-    </>
+    </PageContainer>
   );
 }

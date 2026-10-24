@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { addDays, addWeeks, format, parseISO } from "date-fns";
 import { Settings } from "lucide-react";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { PlannerWorkspace, type WeekOption } from "@/components/planner-workspace";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export default async function PlannerPage() {
   ];
 
   return (
-    <>
+    <PageContainer size="default">
       <PageHeader
         title="Study planner"
         description="Generate a weekly plan from your goals, availability, exams and study history, then review it before it goes on your calendar."
@@ -61,6 +62,6 @@ export default async function PlannerPage() {
         hasAvailability={Object.keys(settings.availability).length > 0}
         userId={user?.id ?? "anonymous"}
       />
-    </>
+    </PageContainer>
   );
 }

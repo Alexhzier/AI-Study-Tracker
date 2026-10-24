@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { addMonths, eachDayOfInterval, endOfMonth, format, getDay, isValid, parseISO } from "date-fns";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { SessionDialog } from "@/components/session-dialog";
 import { SessionRow } from "@/components/session-row";
@@ -21,7 +22,7 @@ const HEAT = [
   "bg-heat-1 text-foreground",
   "bg-heat-2 text-foreground",
   "bg-heat-3 text-foreground",
-  "bg-heat-4 text-[#10181a]",
+  "bg-heat-4 text-heat-4-foreground",
 ];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -83,7 +84,7 @@ export default async function CalendarPage({
   const selectedPlannedTotal = selectedPlanned.reduce((n, p) => n + p.item.duration_minutes, 0);
 
   return (
-    <>
+    <PageContainer size="wide">
       <PageHeader title="Calendar" description={`${formatMinutes(monthTotal)} studied in ${format(monthStart, "MMMM yyyy")}`} />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_21rem]">
@@ -148,7 +149,7 @@ export default async function CalendarPage({
 
         <aside aria-label="Selected day" className="h-fit rounded-lg border bg-card shadow-xs">
           {selected ? (
-            <>
+            <PageContainer size="wide">
               <div className="flex items-start justify-between gap-3 border-b px-4 py-3">
                 <div>
                   <h2 className="text-sm font-semibold">{format(parseISO(selected), "EEEE, MMM d")}</h2>
@@ -211,12 +212,12 @@ export default async function CalendarPage({
                   {selectedSessions.map((s) => <SessionRow key={s.id} session={s} subjects={subjects} />)}
                 </ul>
               )}
-            </>
+            </PageContainer>
           ) : (
             <p className="px-4 py-8 text-center text-sm text-muted-foreground">Select a day to see its sessions.</p>
           )}
         </aside>
       </div>
-    </>
+    </PageContainer>
   );
 }

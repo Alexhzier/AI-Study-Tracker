@@ -3,6 +3,7 @@ import Link from "next/link";
 import { addDays, addWeeks, format, isValid, parseISO } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HoursBarChart, SubjectPie } from "@/components/charts";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { dailyForWeek, recentMonths, recentWeeks, subjectDistribution, weekStartISO } from "@/lib/analytics";
@@ -33,12 +34,12 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   if (rows.length === 0) {
     return (
-      <>
+      <PageContainer size="wide">
         <PageHeader title="Analytics" />
         <div className="rounded-lg border border-dashed p-10 text-center">
           <p className="text-sm text-muted-foreground">Charts appear after you log your first session.</p>
         </div>
-      </>
+      </PageContainer>
     );
   }
 
@@ -51,7 +52,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const next = format(addWeeks(start, 1), "yyyy-MM-dd");
 
   return (
-    <>
+    <PageContainer size="wide">
       <PageHeader title="Analytics" description="Weeks run Monday to Sunday." />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card
@@ -87,6 +88,6 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           <HoursBarChart data={recentMonths(rows, today)} label="Total study hours by month" />
         </Card>
       </div>
-    </>
+    </PageContainer>
   );
 }

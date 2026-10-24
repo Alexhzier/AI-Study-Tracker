@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { Plus } from "lucide-react";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { SessionDialog } from "@/components/session-dialog";
 import { SessionRow } from "@/components/session-row";
@@ -30,7 +31,7 @@ export default async function SessionsPage({
   const more = `/sessions?${new URLSearchParams({ ...(subjectId ? { subject: subjectId } : {}), limit: String(limit + 100) })}`;
 
   return (
-    <>
+    <PageContainer size="content">
       <PageHeader
         title="Sessions"
         action={
@@ -71,6 +72,6 @@ export default async function SessionsPage({
           )}
         </div>
       )}
-    </>
+    </PageContainer>
   );
 }

@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument" });
 
 export const metadata: Metadata = {
   title: { default: "Study Tracker", template: "%s · Study Tracker" },

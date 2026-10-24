@@ -98,9 +98,9 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
     });
   }
 
-  const shell = "mb-6 rounded-lg border bg-card p-4 shadow-xs";
+  const shell = "h-full rounded-lg border bg-card p-5 lg:p-6";
 
-  if (!ready) return <div className="mb-6 h-[4.5rem] rounded-lg border bg-card shadow-xs" aria-hidden />;
+  if (!ready) return <div className="min-h-40 rounded-lg border bg-card" aria-hidden />;
 
   if (loadError && !timer) {
     return (
@@ -125,14 +125,15 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
     }
     return (
       <section aria-label="Study timer" className={shell}>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="min-w-48 flex-1">
+        <p className="mb-3 text-sm text-muted-foreground">Study timer</p>
+        <div className="flex flex-col gap-3">
+          <div>
             <label htmlFor="timer-subject" className="sr-only">Subject</label>
             <select id="timer-subject" value={subjectId} onChange={(e) => setSubjectId(e.target.value)} className={fieldClass}>
               {active.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-          <Button disabled={pending || !subjectId} onClick={() => act(() => timerStart(subjectId))}>
+          <Button className="w-full" disabled={pending || !subjectId} onClick={() => act(() => timerStart(subjectId))}>
             <Play className="size-4" aria-hidden /> Start timer
           </Button>
         </div>
@@ -189,7 +190,7 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
             <span className="truncate">{subject?.name ?? "Unknown subject"}</span>
             <span aria-live="polite">· {running ? "Running" : "Paused"}</span>
           </p>
-          <p role="timer" className={`mt-0.5 text-3xl font-semibold tabular-nums tracking-tight ${running ? "" : "text-muted-foreground"}`}>
+          <p role="timer" className={`mt-0.5 text-display font-semibold tabular-nums ${running ? "" : "text-muted-foreground"}`}>
             {clock(ms)}
           </p>
         </div>

@@ -43,7 +43,7 @@ function friendlyAiError(e: unknown): string {
 export async function generatePlan(week: "this" | "next"): Promise<GenerateResult> {
   const cfg = aiConfig();
   if (!cfg.enabled) {
-    return { error: "AI planning isn't set up yet. The site owner must add OPENAI_API_KEY and OPENAI_MODEL." };
+    return { error: "Live AI generation isn't enabled on this server." };
   }
   if (week !== "this" && week !== "next") return { error: "Choose a week." };
 

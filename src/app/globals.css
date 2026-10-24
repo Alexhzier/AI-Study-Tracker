@@ -3,60 +3,69 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Palette: chalk paper, slate ink, a single deep-teal accent (and its heatmap ramp). */
+/*
+  Design tokens
+  Surfaces:  background < card (surface) < secondary/popover (elevated)
+  Lines:     --border = dividers and panel edges (decorative, ~1.5:1)
+             --input  = form-control edges (>= 3:1 on card, WCAG 1.4.11)
+  Accent:    --primary, used sparingly: progress, active nav, primary buttons, links.
+  All text/background pairs below were contrast-tested (>= 4.5:1 for text).
+*/
 :root {
-  --radius: 0.5rem;
-  --background: #f7f7f5;
-  --foreground: #1d2227;
+  --radius: 0.375rem;
+  --background: #f5f6f4;
+  --foreground: #151b1d;
   --card: #ffffff;
-  --card-foreground: #1d2227;
+  --card-foreground: #151b1d;
   --popover: #ffffff;
-  --popover-foreground: #1d2227;
-  --primary: #2f6f6a;
+  --popover-foreground: #151b1d;
+  --primary: #2b6b64;
   --primary-foreground: #f4faf9;
-  --secondary: #eeeeea;
-  --secondary-foreground: #1d2227;
-  --muted: #eeeeea;
-  --muted-foreground: #646b73;
-  --accent: #e7efee;
-  --accent-foreground: #1f4b47;
+  --secondary: #eef0ed;
+  --secondary-foreground: #151b1d;
+  --muted: #e9ece8;
+  --muted-foreground: #566265;
+  --accent: #e4eeec;
+  --accent-foreground: #1d4a45;
   --destructive: #b3372f;
-  --border: #e2e2dd;
-  --input: #d6d6d0;
-  --ring: #2f6f6a;
+  --border: #dfe3df;
+  --input: #7c8782;
+  --ring: #2b6b64;
   --heat-1: #dcebe9;
   --heat-2: #b4d6d2;
   --heat-3: #7fb6b0;
   --heat-4: #4a928b;
+  --heat-4-foreground: #10181a;
 }
 
 .dark {
-  --background: #14171a;
-  --foreground: #e8e9e6;
-  --card: #1b1f23;
-  --card-foreground: #e8e9e6;
-  --popover: #1b1f23;
-  --popover-foreground: #e8e9e6;
-  --primary: #5fb0a8;
-  --primary-foreground: #0f1b1a;
-  --secondary: #242a2e;
-  --secondary-foreground: #e8e9e6;
-  --muted: #242a2e;
-  --muted-foreground: #959ca3;
+  --background: #111617;
+  --foreground: #f1f4f2;
+  --card: #182022;
+  --card-foreground: #f1f4f2;
+  --popover: #222b2d;
+  --popover-foreground: #f1f4f2;
+  --primary: #70b7ac;
+  --primary-foreground: #0e1a18;
+  --secondary: #222b2d;
+  --secondary-foreground: #f1f4f2;
+  --muted: #232d2f;
+  --muted-foreground: #aab7b8;
   --accent: #1f2d2c;
-  --accent-foreground: #b4d6d2;
-  --destructive: #e0675e;
-  --border: #2a3035;
-  --input: #343b41;
-  --ring: #5fb0a8;
-  --heat-1: #1f3331;
+  --accent-foreground: #d4e8e4;
+  --destructive: #ee7b72;
+  --border: #304043;
+  --input: #5e7578;
+  --ring: #70b7ac;
+  --heat-1: #1d3532;
   --heat-2: #2a4d49;
-  --heat-3: #3a706a;
-  --heat-4: #5fb0a8;
+  --heat-3: #356d66;
+  --heat-4: #70b7ac;
+  --heat-4-foreground: #0e1a18;
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -79,15 +88,50 @@
   --color-heat-2: var(--heat-2);
   --color-heat-3: var(--heat-3);
   --color-heat-4: var(--heat-4);
+  --color-heat-4-foreground: var(--heat-4-foreground);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
 }
 
+@theme {
+  /* Type scale: 12 / 14 body / 20 / 22 title / 44 display */
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: -0.015em;
+  --text-display: 2.75rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+
+  /* One elevation language: borders, not shadows. */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+
+  /* Motion: quick and predictable. */
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
 @layer base {
   * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground antialiased; font-feature-settings: "tnum" 1, "cv11" 1; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "tnum" 1, "cv11" 1;
+    text-rendering: optimizeLegibility;
+  }
+  /* Visible keyboard focus everywhere. Components that define their own focus style override this. */
+  :where(a, button, summary, [role="radio"], [role="tab"]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection { background: color-mix(in srgb, var(--primary) 30%, transparent); }
   @media (prefers-reduced-motion: reduce) {
-    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

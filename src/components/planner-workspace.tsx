@@ -146,7 +146,7 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
     <div className="space-y-6">
       {!enabled && (
         <p role="status" className="rounded-md border bg-card px-4 py-3 text-sm text-muted-foreground">
-          AI planning isn&rsquo;t set up on this server yet. The site owner needs to add an OpenAI API key and model name.
+          Live AI generation isn&rsquo;t enabled on this server.
         </p>
       )}
       {enabled && !hasAvailability && (
@@ -178,7 +178,7 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
           </Button>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {enabled ? `${remaining} of ${limit} AI plans left in the last 24 hours.` : "Unavailable until AI is configured."}
+          {enabled ? `${remaining} of ${limit} AI plans left in the last 24 hours.` : "Live generation is turned off on this deployment."}
           {draft && " Discard the draft to switch weeks."}
         </p>
         {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}

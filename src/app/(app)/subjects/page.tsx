@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { ArchiveButton } from "@/components/archive-button";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { SubjectDialog } from "@/components/subject-dialog";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export default async function SubjectsPage() {
   };
 
   return (
-    <>
+    <PageContainer size="content">
       <PageHeader
         title="Subjects"
         description="Archiving a subject hides it from new sessions but keeps all its history."
@@ -71,6 +72,6 @@ export default async function SubjectsPage() {
           )}
         </div>
       )}
-    </>
+    </PageContainer>
   );
 }
