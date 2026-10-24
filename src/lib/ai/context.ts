@@ -117,7 +117,7 @@ export async function buildPlanningContext(weekStart: string): Promise<PlanningC
     budgetMinutes: Math.floor(budget / 5) * 5,
     stats,
     subjectStats: perSubject,
-    recentNotes: ((notesRes.data ?? []) as any[])
+    recentNotes: ((notesRes.data ?? []) as { subject_id: string; session_date: string; notes: string }[])
       .filter((n) => active.has(n.subject_id))
       .map((n) => ({
         subject_id: n.subject_id,

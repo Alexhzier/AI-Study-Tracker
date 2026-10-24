@@ -2,6 +2,7 @@ import { addDays, addMonths, addWeeks, format, parseISO, startOfMonth, startOfWe
 import type { SessionLite, Subject } from "@/lib/types";
 
 const iso = (d: Date) => format(d, "yyyy-MM-dd");
+/** Hours are only used to size bars. Labels and tooltips always use the exact `minutes`. */
 const hrs = (minutes: number) => Math.round((minutes / 60) * 100) / 100;
 
 function sumBy(rows: SessionLite[], key: (r: SessionLite) => string) {
@@ -16,13 +17,21 @@ function sumBy(rows: SessionLite[], key: (r: SessionLite) => string) {
 /** Monday of the week containing the given yyyy-MM-dd date. */
 export const weekStartISO = (dateISO: string) => iso(startOfWeek(parseISO(dateISO), { weekStartsOn: 1 }));
 
-export type Point = { label: string; hours: number };
+export type Point = {
+  label: string;
+  title: string;
+  hours: number;
+  minutes: number;
+  /** The period that contains today; charts give it full emphasis. */
+  current?: boolean;
+};
 
-export function dailyForWeek(rows: SessionLite[], weekStart: string): Point[] {
+export function dailyForWeek(rows: SessionLite[], weekStart: string, today?: string): Point[] {
   const byDay = sumBy(rows, (r) => r.session_date);
   return Array.from({ length: 7 }, (_, i) => {
     const d = addDays(parseISO(weekStart), i);
-    return { label: format(d, "EEE"), hours: hrs(byDay.get(iso(d)) ?? 0) };
+    const minutes = byDay.get(iso(d)) ?? 0;
+    return { label: format(d, "EEE"), title: format(d, "EEEE, MMM d"), hours: hrs(minutes), minutes, current: iso(d) === today };
   });
 }
 
@@ -31,7 +40,8 @@ export function recentWeeks(rows: SessionLite[], today: string, n = 12): Point[]
   const current = parseISO(weekStartISO(today));
   return Array.from({ length: n }, (_, i) => {
     const d = addWeeks(current, i - (n - 1));
-    return { label: format(d, "MMM d"), hours: hrs(byWeek.get(iso(d)) ?? 0) };
+    const minutes = byWeek.get(iso(d)) ?? 0;
+    return { label: format(d, "MMM d"), title: `Week of ${format(d, "MMM d")}`, hours: hrs(minutes), minutes, current: i === n - 1 };
   });
 }
 
@@ -40,7 +50,8 @@ export function recentMonths(rows: SessionLite[], today: string, n = 12): Point[
   const current = startOfMonth(parseISO(today));
   return Array.from({ length: n }, (_, i) => {
     const d = addMonths(current, i - (n - 1));
-    return { label: format(d, "MMM yy"), hours: hrs(byMonth.get(format(d, "yyyy-MM")) ?? 0) };
+    const minutes = byMonth.get(format(d, "yyyy-MM")) ?? 0;
+    return { label: format(d, "MMM yy"), title: format(d, "MMMM yyyy"), hours: hrs(minutes), minutes, current: i === n - 1 };
   });
 }
 

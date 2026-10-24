@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DemoButton } from "@/components/demo-button";
+import { SamplePlanCard } from "@/components/sample-plan-card";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
@@ -53,6 +54,10 @@ export default async function Home() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-label="Sample plan" className="mt-12">
+        <SamplePlanCard />
       </section>
 
       <section aria-labelledby="stack-h" className="mt-12">

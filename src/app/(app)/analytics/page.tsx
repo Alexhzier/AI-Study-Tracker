@@ -5,24 +5,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HoursBarChart, SubjectPie } from "@/components/charts";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { Panel, PanelHeader } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import { dailyForWeek, recentMonths, recentWeeks, subjectDistribution, weekStartISO } from "@/lib/analytics";
+import { getPlannerSettings } from "@/lib/data/planner";
 import { getSessionLite, getSubjects } from "@/lib/data/queries";
+import { computeInsights } from "@/lib/insights";
 import { formatMinutes, todayISO } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Analytics" };
-
-function Card({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <section className="rounded-lg border bg-card p-4 shadow-xs">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold">{title}</h2>
-        {aside}
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ week?: string }> }) {
   const sp = await searchParams;
@@ -30,14 +21,15 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const parsed = sp.week ? parseISO(sp.week) : null;
   const ref = parsed && isValid(parsed) && format(parsed, "yyyy-MM-dd") === sp.week ? sp.week : today;
 
-  const [subjects, rows] = await Promise.all([getSubjects(), getSessionLite()]);
+  const [subjects, rows, planner] = await Promise.all([getSubjects(), getSessionLite(), getPlannerSettings()]);
 
   if (rows.length === 0) {
     return (
       <PageContainer size="wide">
         <PageHeader title="Analytics" />
-        <div className="rounded-lg border border-dashed p-10 text-center">
-          <p className="text-sm text-muted-foreground">Charts appear after you log your first session.</p>
+        <div className="rounded-lg border border-dashed px-6 py-14 text-center">
+          <h2 className="text-sm font-semibold">No data to chart yet</h2>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">Log a study session and your charts and observations will appear here.</p>
         </div>
       </PageContainer>
     );
@@ -46,47 +38,70 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const weekStart = weekStartISO(ref);
   const currentWeek = weekStartISO(today);
   const start = parseISO(weekStart);
-  const daily = dailyForWeek(rows, weekStart);
-  const weekTotal = daily.reduce((n, d) => n + d.hours, 0);
+  const daily = dailyForWeek(rows, weekStart, today);
+  const weekTotal = daily.reduce((n, d) => n + d.minutes, 0);
   const prev = format(addWeeks(start, -1), "yyyy-MM-dd");
   const next = format(addWeeks(start, 1), "yyyy-MM-dd");
+  const insights = computeInsights(rows, subjects, planner.weeklyGoalMinutes, today);
 
   return (
     <PageContainer size="wide">
       <PageHeader title="Analytics" description="Weeks run Monday to Sunday." />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card
-          title={`Daily hours · ${format(start, "MMM d")} – ${format(addDays(start, 6), "MMM d")}`}
-          aside={
-            <div className="flex items-center gap-1">
-              <Button asChild variant="ghost" size="icon" aria-label="Previous week">
-                <Link href={`/analytics?week=${prev}`}><ChevronLeft className="size-4" aria-hidden /></Link>
-              </Button>
-              {weekStart !== currentWeek ? (
-                <Button asChild variant="ghost" size="icon" aria-label="Next week">
-                  <Link href={`/analytics?week=${next}`}><ChevronRight className="size-4" aria-hidden /></Link>
+
+      {insights.length > 0 && (
+        <Panel aria-labelledby="insights-h" className="mb-4">
+          <PanelHeader id="insights-h" title="At a glance" />
+          <ul className="grid gap-x-10 gap-y-3 p-4 md:grid-cols-2">
+            {insights.map((i) => (
+              <li key={i.id} className="text-sm leading-relaxed text-muted-foreground">
+                <strong className="font-semibold text-foreground">{i.lead}</strong>
+                {i.rest}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Panel aria-labelledby="daily-h">
+          <PanelHeader
+            id="daily-h" title="Daily hours"
+            action={
+              <div className="flex items-center gap-1">
+                <span className="mr-1 text-xs text-muted-foreground">{format(start, "MMM d")} – {format(addDays(start, 6), "MMM d")}</span>
+                <Button asChild variant="ghost" size="icon" aria-label="Previous week" className="size-8">
+                  <Link href={`/analytics?week=${prev}`}><ChevronLeft className="size-4" aria-hidden /></Link>
                 </Button>
-              ) : (
-                <Button variant="ghost" size="icon" aria-label="Next week" disabled><ChevronRight className="size-4" aria-hidden /></Button>
-              )}
-            </div>
-          }
-        >
-          <HoursBarChart data={daily} label="Daily study hours for the selected week" />
-          <p className="mt-2 text-xs text-muted-foreground">Week total: {formatMinutes(Math.round(weekTotal * 60))}</p>
-        </Card>
+                {weekStart !== currentWeek ? (
+                  <Button asChild variant="ghost" size="icon" aria-label="Next week" className="size-8">
+                    <Link href={`/analytics?week=${next}`}><ChevronRight className="size-4" aria-hidden /></Link>
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="icon" aria-label="Next week" disabled className="size-8"><ChevronRight className="size-4" aria-hidden /></Button>
+                )}
+              </div>
+            }
+          />
+          <div className="p-4">
+            <HoursBarChart data={daily} label="Daily study time for the selected week" />
+          </div>
+          <p className="border-t px-4 py-2.5 text-xs text-muted-foreground">Week total: {formatMinutes(weekTotal)}</p>
+        </Panel>
 
-        <Card title="Weekly hours · last 12 weeks">
-          <HoursBarChart data={recentWeeks(rows, today)} label="Weekly study hours for the last 12 weeks" />
-        </Card>
+        <Panel aria-labelledby="weekly-h">
+          <PanelHeader id="weekly-h" title="Weekly hours" action={<span className="text-xs text-muted-foreground">Last 12 weeks</span>} />
+          <div className="p-4"><HoursBarChart data={recentWeeks(rows, today)} label="Weekly study time for the last 12 weeks" /></div>
+        </Panel>
 
-        <Card title="Time by subject · all time">
-          <SubjectPie data={subjectDistribution(rows, subjects)} />
-        </Card>
+        <Panel aria-labelledby="subject-h">
+          <PanelHeader id="subject-h" title="Time by subject" action={<span className="text-xs text-muted-foreground">All time</span>} />
+          <div className="p-4"><SubjectPie data={subjectDistribution(rows, subjects)} /></div>
+        </Panel>
 
-        <Card title="Hours by month · last 12 months">
-          <HoursBarChart data={recentMonths(rows, today)} label="Total study hours by month" />
-        </Card>
+        <Panel aria-labelledby="monthly-h">
+          <PanelHeader id="monthly-h" title="Monthly hours" action={<span className="text-xs text-muted-foreground">Last 12 months</span>} />
+          <div className="p-4"><HoursBarChart data={recentMonths(rows, today)} label="Study time by month for the last 12 months" /></div>
+        </Panel>
       </div>
     </PageContainer>
   );

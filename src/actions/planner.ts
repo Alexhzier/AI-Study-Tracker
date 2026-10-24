@@ -140,7 +140,7 @@ export async function approvePlan(input: z.input<typeof approveSchema>): Promise
   const { data: subjects, error: sErr } = await supabase.from("subjects").select("id,is_archived").in("id", ids);
   if (sErr) return { error: "Couldn't verify your subjects. Try again." };
   if ((subjects ?? []).length !== ids.length) return { error: "A planned subject no longer exists. Regenerate the plan." };
-  if ((subjects ?? []).some((s: any) => s.is_archived)) return { error: "A planned subject is archived. Restore it or remove its sessions." };
+  if ((subjects ?? []).some((s: { is_archived: boolean }) => s.is_archived)) return { error: "A planned subject is archived. Restore it or remove its sessions." };
 
   const { error } = await supabase.rpc("approve_study_plan", {
     p_week_start: weekStart,

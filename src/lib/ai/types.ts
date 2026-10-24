@@ -26,7 +26,7 @@ export type PlanDraft = {
 
 export type GenerateResult = { error?: string; draft?: PlanDraft };
 
-export type ApprovedPlan = { id: string; summary: string | null; items: PlanItem[] };
+export type ApprovedPlan = { id: string; summary: string | null; model: string | null; items: PlanItem[] };
 
 export type PlannedItem = {
   id: string;

@@ -2,6 +2,14 @@ import { addDays, format, parseISO } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import type { ApprovedPlan, Exam, PlanItem, PlannedItem } from "@/lib/ai/types";
 
+type PrioRow = { subject_id: string; priority: number; weekly_target_minutes: number | null };
+type AvailRow = { weekday: number; available_minutes: number };
+type PlanRow = { id: string; week_start: string; summary: string | null; model: string | null };
+type ItemRow = {
+  plan_id: string; subject_id: string; topic: string | null; planned_date: string;
+  duration_minutes: number; explanation: string; source: PlanItem["source"];
+};
+
 export type PlannerSettings = {
   weeklyGoalMinutes: number | null;
   dailyGoalMinutes: number | null;
@@ -25,10 +33,10 @@ export async function getPlannerSettings(): Promise<PlannerSettings> {
     weeklyGoalMinutes: settings.data?.weekly_goal_minutes ?? null,
     dailyGoalMinutes: settings.data?.daily_goal_minutes ?? null,
     weeklyTargets: Object.fromEntries(
-      (prios.data ?? []).filter((p: any) => p.weekly_target_minutes).map((p: any) => [p.subject_id, p.weekly_target_minutes]),
+      ((prios.data ?? []) as PrioRow[]).flatMap((p): [string, number][] => (p.weekly_target_minutes ? [[p.subject_id, p.weekly_target_minutes]] : [])),
     ),
-    availability: Object.fromEntries((avail.data ?? []).map((a: any) => [a.weekday, a.available_minutes])),
-    priorities: Object.fromEntries((prios.data ?? []).map((p: any) => [p.subject_id, p.priority])),
+    availability: Object.fromEntries(((avail.data ?? []) as AvailRow[]).map((a) => [a.weekday, a.available_minutes])),
+    priorities: Object.fromEntries(((prios.data ?? []) as PrioRow[]).map((p) => [p.subject_id, p.priority])),
   };
 }
 
@@ -47,7 +55,7 @@ export async function getApprovedPlans(weekStarts: string[]): Promise<Record<str
   const supabase = await createClient();
   const { data: plans, error } = await supabase
     .from("study_plans")
-    .select("id,week_start,summary")
+    .select("id,week_start,summary,model")
     .eq("status", "approved")
     .in("week_start", weekStarts);
   if (error) throw new Error(error.message);
@@ -56,19 +64,20 @@ export async function getApprovedPlans(weekStarts: string[]): Promise<Record<str
   const { data: items, error: e2 } = await supabase
     .from("study_plan_items")
     .select("plan_id,subject_id,topic,planned_date,duration_minutes,explanation,source")
-    .in("plan_id", plans.map((p: any) => p.id))
+    .in("plan_id", (plans as PlanRow[]).map((p) => p.id))
     .order("planned_date")
     .order("created_at");
   if (e2) throw new Error(e2.message);
 
   const out: Record<string, ApprovedPlan> = {};
-  for (const p of plans as any[]) {
+  for (const p of plans as PlanRow[]) {
     out[p.week_start] = {
       id: p.id,
       summary: p.summary,
-      items: (items ?? [])
-        .filter((i: any) => i.plan_id === p.id)
-        .map((i: any): PlanItem => ({
+      model: p.model,
+      items: ((items ?? []) as ItemRow[])
+        .filter((i) => i.plan_id === p.id)
+        .map((i): PlanItem => ({
           subject_id: i.subject_id,
           topic: i.topic,
           date: i.planned_date,
@@ -97,7 +106,7 @@ export async function getPlannedItems(from: string, to: string): Promise<Planned
   const { data, error: e2 } = await supabase
     .from("study_plan_items")
     .select("id,subject_id,topic,planned_date,duration_minutes,explanation")
-    .in("plan_id", plans.map((p: any) => p.id))
+    .in("plan_id", (plans as PlanRow[]).map((p) => p.id))
     .gte("planned_date", from)
     .lte("planned_date", to)
     .order("planned_date")
