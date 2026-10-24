@@ -46,6 +46,8 @@ function SessionForm({
   const options = subjects.filter((s) => !s.is_archived || s.id === session?.subject_id);
   const [start, setStart] = useState(session?.started_at ? toLocalTime(session.started_at) : "");
   const [end, setEnd] = useState(session?.ended_at ? toLocalTime(session.ended_at) : "");
+  const [hours, setHours] = useState(session ? String(Math.floor(session.duration_minutes / 60)) : "");
+  const [minutes, setMinutes] = useState(session ? String(session.duration_minutes % 60) : "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -111,18 +113,29 @@ function SessionForm({
         </div>
       </div>
 
-      <fieldset className="space-y-1.5">
+      <fieldset className="space-y-2">
         <legend className="text-sm font-medium">Duration</legend>
+        <div className="flex flex-wrap gap-1.5">
+          {[15, 30, 45, 60, 90, 120].map((m) => (
+            <button
+              key={m} type="button" disabled={lockDuration}
+              onClick={() => { setHours(String(Math.floor(m / 60) || "")); setMinutes(String(m % 60 || "")); }}
+              className="h-8 rounded-md border border-input px-2.5 text-xs transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {formatMinutes(m)}
+            </button>
+          ))}
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2">
-            <input aria-label="Hours" name="hours" type="number" min={0} max={24} inputMode="numeric" placeholder="0"
-              disabled={lockDuration} defaultValue={session ? Math.floor(session.duration_minutes / 60) : ""} className={fieldClass} />
-            <span className="text-sm text-muted-foreground">h</span>
+          <div className="space-y-1.5">
+            <label htmlFor="hours" className="text-xs text-muted-foreground">Hours</label>
+            <input id="hours" name="hours" type="number" min={0} max={24} inputMode="numeric" placeholder="0"
+              disabled={lockDuration} value={hours} onChange={(e) => setHours(e.target.value)} className={fieldClass} />
           </div>
-          <div className="flex items-center gap-2">
-            <input aria-label="Minutes" name="minutes" type="number" min={0} max={59} inputMode="numeric" placeholder="0"
-              disabled={lockDuration} defaultValue={session ? session.duration_minutes % 60 : ""} className={fieldClass} />
-            <span className="text-sm text-muted-foreground">m</span>
+          <div className="space-y-1.5">
+            <label htmlFor="minutes" className="text-xs text-muted-foreground">Minutes</label>
+            <input id="minutes" name="minutes" type="number" min={0} max={59} inputMode="numeric" placeholder="0"
+              disabled={lockDuration} value={minutes} onChange={(e) => setMinutes(e.target.value)} className={fieldClass} />
           </div>
         </div>
         {lockDuration && (

@@ -4,6 +4,7 @@ import { addMonths, eachDayOfInterval, endOfMonth, format, getDay, isValid, pars
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { ScrollToDetail } from "@/components/scroll-to-detail";
 import { SessionDialog } from "@/components/session-dialog";
 import { SessionRow } from "@/components/session-row";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import type { PlannedItem } from "@/lib/ai/types";
 import { getPlannedItems } from "@/lib/data/planner";
 import { getSubjects, listSessions } from "@/lib/data/queries";
 import { heatLevel } from "@/lib/stats";
-import { formatHoursShort, formatMinutes, todayISO } from "@/lib/time";
+import { formatMinutes, todayISO } from "@/lib/time";
 import type { Session } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +25,21 @@ const HEAT = [
   "bg-heat-3 text-foreground",
   "bg-heat-4 text-heat-4-foreground",
 ];
+const LEGEND = ["None", "< 1h", "1–2h", "2–4h", "4h+"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/** Exact minutes, never rounded decimals. Stacks on narrow cells so nothing is truncated. */
+function CellDuration({ minutes }: { minutes: number }) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return (
+    <span className="flex flex-col text-[11px] font-medium leading-tight tabular-nums sm:flex-row sm:gap-1 sm:text-xs" aria-hidden>
+      {h > 0 && <span>{h}h</span>}
+      {(m > 0 || h === 0) && <span>{m}m</span>}
+    </span>
+  );
+}
 
 /** A planned item counts as done when enough time was actually logged for that subject that day. */
 function planProgress(items: PlannedItem[], sessions: Session[], today: string) {
@@ -78,104 +93,144 @@ export default async function CalendarPage({
   const days = eachDayOfInterval({ start: monthStart, end: endOfMonth(monthStart) });
   const offset = (getDay(monthStart) + 6) % 7; // Monday-first grid
   const href = (m: string, d?: string) => `/calendar?month=${m}${d ? `&date=${d}` : ""}`;
-  const selectedSessions = selected ? sessions.filter((s) => s.session_date === selected) : [];
-  const selectedPlanned = selected ? progress.filter((p) => p.item.planned_date === selected) : [];
-  const selectedTotal = selectedSessions.reduce((n, s) => n + s.duration_minutes, 0);
-  const selectedPlannedTotal = selectedPlanned.reduce((n, p) => n + p.item.duration_minutes, 0);
+
+  const daySessions = selected ? sessions.filter((s) => s.session_date === selected) : [];
+  const dayPlanned = selected ? progress.filter((p) => p.item.planned_date === selected) : [];
+  const dayTotal = daySessions.reduce((n, s) => n + s.duration_minutes, 0);
+  const dayPlannedTotal = dayPlanned.reduce((n, p) => n + p.item.duration_minutes, 0);
+
+  const bySubject = new Map<string, number>();
+  for (const s of daySessions) bySubject.set(s.subject_id, (bySubject.get(s.subject_id) ?? 0) + s.duration_minutes);
+  const subjectChips = [...bySubject.entries()]
+    .map(([id, minutes]) => ({ subject: subjects.find((x) => x.id === id), minutes }))
+    .sort((a, b) => b.minutes - a.minutes);
+
+  const summary = [
+    dayTotal ? `${formatMinutes(dayTotal)} studied` : "No study time",
+    daySessions.length ? plural(daySessions.length, "session") : null,
+    dayPlannedTotal ? `${formatMinutes(dayPlannedTotal)} planned` : null,
+  ].filter(Boolean).join(" · ");
 
   return (
     <PageContainer size="wide">
-      <PageHeader title="Calendar" description={`${formatMinutes(monthTotal)} studied in ${format(monthStart, "MMMM yyyy")}`} />
+      <PageHeader title="Calendar" />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_21rem]">
-        <section aria-label="Month view">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight">{format(monthStart, "MMMM yyyy")}</h2>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_23rem]">
+        <section aria-label={`${format(monthStart, "MMMM yyyy")} calendar`}>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+            <div>
+              <h2 className="text-title font-semibold">{format(monthStart, "MMMM yyyy")}</h2>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {formatMinutes(monthTotal)} studied · {plural(byDay.size, "study day")}
+              </p>
+            </div>
             <div className="flex items-center gap-1">
               <Button asChild variant="ghost" size="icon" aria-label="Previous month">
                 <Link href={href(format(addMonths(monthStart, -1), "yyyy-MM"))}><ChevronLeft className="size-4" aria-hidden /></Link>
               </Button>
-              <Button asChild variant="outline" size="sm"><Link href={href(today.slice(0, 7), today)}>Today</Link></Button>
+              <Button asChild variant="outline"><Link href={href(today.slice(0, 7), today)}>Today</Link></Button>
               <Button asChild variant="ghost" size="icon" aria-label="Next month">
                 <Link href={href(format(addMonths(monthStart, 1), "yyyy-MM"))}><ChevronRight className="size-4" aria-hidden /></Link>
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5">
-            {WEEKDAYS.map((w) => (
-              <div key={w} className="pb-1 text-center text-xs text-muted-foreground">{w}</div>
-            ))}
-            {Array.from({ length: offset }).map((_, i) => <div key={`pad-${i}`} />)}
+          <div className="grid grid-cols-7 gap-1 pb-1.5 text-center text-xs text-muted-foreground sm:gap-1.5" aria-hidden>
+            {WEEKDAYS.map((w) => <div key={w}>{w}</div>)}
+          </div>
+
+          <ol className="grid grid-cols-7 gap-1 sm:gap-1.5">
+            {Array.from({ length: offset }).map((_, i) => <li key={`pad-${i}`} aria-hidden />)}
             {days.map((day) => {
               const iso = format(day, "yyyy-MM-dd");
               const minutes = byDay.get(iso) ?? 0;
               const plannedMin = plannedByDay.get(iso) ?? 0;
               const isToday = iso === today;
               return (
-                <Link
-                  key={iso} href={href(month, iso)} scroll={false}
-                  aria-label={`${format(day, "MMMM d")}: ${minutes ? `${formatMinutes(minutes)} studied` : "no study"}${plannedMin ? `, ${formatMinutes(plannedMin)} planned` : ""}`}
-                  aria-current={iso === selected ? "date" : undefined}
-                  className={cn(
-                    "flex aspect-square flex-col justify-between rounded-md border p-1.5 text-xs transition-colors sm:aspect-[5/4]",
-                    HEAT[heatLevel(minutes)],
-                    plannedMin > 0 && "border-dashed border-primary",
-                    iso === selected && "ring-2 ring-primary ring-offset-1 ring-offset-background",
-                  )}
-                >
-                  <span className="flex items-start justify-between">
-                    <span className={cn("tabular-nums", isToday && "font-semibold underline underline-offset-2")}>{format(day, "d")}</span>
-                    {plannedMin > 0 && <span className="size-2 rounded-full border-[1.5px] border-current" aria-hidden />}
-                  </span>
-                  {minutes > 0 && <span className="tabular-nums font-medium">{formatHoursShort(minutes)}</span>}
-                </Link>
+                <li key={iso}>
+                  <Link
+                    href={href(month, iso)} scroll={false}
+                    aria-label={`${format(day, "EEEE, MMMM d")}: ${minutes ? `${formatMinutes(minutes)} studied` : "no study"}${plannedMin ? `, ${formatMinutes(plannedMin)} planned` : ""}${isToday ? ", today" : ""}`}
+                    aria-current={iso === selected ? "date" : undefined}
+                    className={cn(
+                      "flex min-h-[4.5rem] flex-col justify-between rounded-md border p-1 text-xs transition-colors sm:min-h-[5.5rem] sm:p-2 lg:min-h-[6.5rem]",
+                      HEAT[heatLevel(minutes)],
+                      plannedMin > 0 && "border-dashed border-primary",
+                      iso === selected && "ring-2 ring-primary ring-offset-1 ring-offset-background",
+                    )}
+                  >
+                    <span className="flex items-start justify-between">
+                      <span className={cn("grid min-w-5 place-items-center tabular-nums sm:text-sm", isToday && "size-6 rounded-full bg-foreground font-semibold text-background")}>
+                        {format(day, "d")}
+                      </span>
+                      {plannedMin > 0 && <span className="mt-0.5 size-2 rounded-full border-[1.5px] border-current" aria-hidden />}
+                    </span>
+                    {minutes > 0 && <CellDuration minutes={minutes} />}
+                  </Link>
+                </li>
               );
             })}
-          </div>
+          </ol>
 
-          <div className="mt-4 flex flex-wrap items-center justify-end gap-x-4 gap-y-1.5 text-xs text-muted-foreground" aria-hidden>
-            <span className="flex items-center gap-1.5">
-              <span className="size-3.5 rounded-sm border border-dashed border-primary bg-card" />
-              <span className="size-2 rounded-full border-[1.5px] border-current" /> Planned
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <span className="flex items-center gap-2">
+              Time studied
+              <span className="flex items-center gap-1.5">
+                {LEGEND.map((label, i) => (
+                  <span key={label} className="flex items-center gap-1">
+                    <span className={cn("size-3.5 rounded-sm border", HEAT[i].split(" ")[0])} aria-hidden />
+                    {label}
+                  </span>
+                ))}
+              </span>
             </span>
             <span className="flex items-center gap-1.5">
-              Completed: less
-              {HEAT.map((c, i) => <span key={i} className={cn("size-3.5 rounded-sm border", c.split(" ")[0])} />)}
-              more
+              <span className="size-3.5 rounded-sm border border-dashed border-primary" aria-hidden />
+              <span className="size-2 rounded-full border-[1.5px] border-current" aria-hidden />
+              Has planned sessions
             </span>
           </div>
         </section>
 
-        <aside aria-label="Selected day" className="h-fit rounded-lg border bg-card shadow-xs">
+        <ScrollToDetail trigger={selected ?? month} label="Selected day" className="h-fit rounded-lg border bg-card xl:sticky xl:top-6">
           {selected ? (
-            <PageContainer size="wide">
-              <div className="flex items-start justify-between gap-3 border-b px-4 py-3">
-                <div>
-                  <h2 className="text-sm font-semibold">{format(parseISO(selected), "EEEE, MMM d")}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedTotal ? `${formatMinutes(selectedTotal)} studied` : "No study time"}
-                    {selectedPlannedTotal ? ` · ${formatMinutes(selectedPlannedTotal)} planned` : ""}
-                  </p>
+            <>
+              <div className="border-b p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold">{format(parseISO(selected), "EEEE, MMMM d, yyyy")}</h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{summary}</p>
+                  </div>
+                  {selected <= today && (
+                    <SessionDialog subjects={subjects} defaultDate={selected}>
+                      <Button size="sm"><Plus className="size-4" aria-hidden /> Add session</Button>
+                    </SessionDialog>
+                  )}
                 </div>
-                {selected <= today && (
-                  <SessionDialog subjects={subjects} defaultDate={selected}>
-                    <Button size="sm"><Plus className="size-4" aria-hidden /> Add</Button>
-                  </SessionDialog>
+                {subjectChips.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Subjects studied">
+                    {subjectChips.map(({ subject, minutes }) => (
+                      <li key={subject?.id ?? "unknown"} className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-xs">
+                        <span className="size-2 rounded-full" style={{ backgroundColor: subject?.color ?? "#999" }} aria-hidden />
+                        {subject?.name ?? "Subject"}
+                        <span className="tabular-nums text-muted-foreground">{formatMinutes(minutes)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
 
-              {selectedPlanned.length > 0 && (
-                <div className="border-b">
-                  <h3 className="px-4 pt-3 text-xs font-medium text-muted-foreground">Planned</h3>
-                  <ul className="space-y-2 p-3">
-                    {selectedPlanned.map(({ item, used, status }) => {
+              {dayPlanned.length > 0 && (
+                <div className={cn("p-3", daySessions.length > 0 && "border-b")}>
+                  <h3 className="px-1 pb-2 text-xs text-muted-foreground">Planned</h3>
+                  <ul className="space-y-2">
+                    {dayPlanned.map(({ item, used, status }) => {
                       const s = subjects.find((x) => x.id === item.subject_id);
                       return (
-                        <li key={item.id} className="rounded-md border border-dashed border-primary/70 px-3 py-2">
-                          <div className="flex items-center justify-between gap-2">
+                        <li key={item.id} className="rounded-md border border-dashed border-primary/60 px-3 py-2">
+                          <div className="flex items-baseline justify-between gap-2">
                             <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
-                              <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: s?.color ?? "#999" }} aria-hidden />
+                              <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: s?.color ?? "#999" }} aria-hidden />
                               <span className="truncate">{s?.name ?? "Subject"}</span>
                             </span>
                             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{formatMinutes(item.duration_minutes)}</span>
@@ -198,25 +253,25 @@ export default async function CalendarPage({
                 </div>
               )}
 
-              {selectedPlanned.length > 0 && selectedSessions.length > 0 && (
-                <h3 className="px-4 pt-3 text-xs font-medium text-muted-foreground">Completed</h3>
+              {daySessions.length > 0 && (
+                <div>
+                  {dayPlanned.length > 0 && <h3 className="px-4 pt-3 text-xs text-muted-foreground">Completed</h3>}
+                  <ul className="divide-y">
+                    {daySessions.map((s) => <SessionRow key={s.id} session={s} subjects={subjects} />)}
+                  </ul>
+                </div>
               )}
-              {selectedSessions.length === 0 ? (
-                selectedPlanned.length === 0 && (
-                  <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    {selected > today ? "This day hasn't happened yet." : "Nothing logged for this day."}
-                  </p>
-                )
-              ) : (
-                <ul className="divide-y">
-                  {selectedSessions.map((s) => <SessionRow key={s.id} session={s} subjects={subjects} />)}
-                </ul>
+
+              {daySessions.length === 0 && dayPlanned.length === 0 && (
+                <p className="px-4 py-6 text-sm text-muted-foreground">
+                  {selected > today ? "This day hasn't happened yet." : "Nothing logged for this day."}
+                </p>
               )}
-            </PageContainer>
+            </>
           ) : (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Select a day to see its sessions.</p>
+            <p className="px-4 py-6 text-sm text-muted-foreground">Select a day to see its sessions.</p>
           )}
-        </aside>
+        </ScrollToDetail>
       </div>
     </PageContainer>
   );

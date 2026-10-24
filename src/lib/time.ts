@@ -43,7 +43,3 @@ export function formatMinutes(total: number) {
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
 }
-
-/** 150 -> "2.5h" (compact, for calendar cells) */
-export const formatHoursShort = (total: number) =>
-  `${(total / 60).toFixed(1).replace(/\.0$/, "")}h`;
