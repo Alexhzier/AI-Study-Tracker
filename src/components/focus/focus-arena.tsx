@@ -15,6 +15,7 @@ import {
 } from "@/actions/timer";
 import { FocusHeader } from "@/components/focus/focus-header";
 import { POMODORO_PRESETS, PomodoroControls } from "@/components/focus/pomodoro-controls";
+import { MusicDock } from "@/components/focus/music-dock";
 import { SessionSummaryDialog } from "@/components/focus/session-summary-dialog";
 import { TimerProgressRing } from "@/components/focus/timer-progress-ring";
 import {
@@ -514,6 +515,11 @@ export function FocusArena({
             isPending={isPending}
             canUsePomodoro={initialCapabilities.supported}
           />
+        </div>
+
+        {/* Music & Soundscapes Dock */}
+        <div className="w-full mt-8">
+          <MusicDock userId={userId} />
         </div>
       </main>
 
