@@ -10,6 +10,7 @@ import {
   Square,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -259,15 +260,14 @@ export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProp
           {/* Header with Title, Fullscreen Link, and Minimize Button */}
           <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-3">
             <div className="flex items-center gap-2">
-              <span className="grid size-6 place-items-center rounded-md bg-gradient-to-br from-primary to-primary/85 text-primary-foreground shadow-xs">
-                <svg viewBox="0 0 16 16" className="size-3.5" fill="none">
-                  <path
-                    d="M8 2.5a5.5 5.5 0 1 1-5.5 5.5"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              <span className="relative grid size-6 place-items-center overflow-hidden rounded-md bg-[#0f171b] shadow-xs ring-1 ring-emerald-500/25">
+                <Image
+                  src="/logo-icon.png"
+                  alt="Pomodoro Focus"
+                  width={24}
+                  height={24}
+                  className="size-full object-contain"
+                />
               </span>
               <span className="text-xs font-bold tracking-tight text-foreground">
                 Pomodoro Focus
@@ -484,16 +484,15 @@ export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProp
               : "bg-primary text-primary-foreground hover:scale-105 shadow-primary/20 ring-2 ring-primary/20"
           }`}
         >
-          {/* Logo Arc Symbol */}
-          <span className="grid size-6 place-items-center rounded-full bg-gradient-to-br from-primary to-primary/85 text-primary-foreground shadow-xs">
-            <svg viewBox="0 0 16 16" className="size-3.5" fill="none">
-              <path
-                d="M8 2.5a5.5 5.5 0 1 1-5.5 5.5"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
+          {/* Logo Brand Emblem */}
+          <span className="relative grid size-6 place-items-center overflow-hidden rounded-full bg-[#0f171b] shadow-xs ring-1 ring-emerald-500/30">
+            <Image
+              src="/logo-icon.png"
+              alt="Pomodoro Focus"
+              width={24}
+              height={24}
+              className="size-full object-contain"
+            />
           </span>
 
           {/* If timer is active: Show live countdown and phase dot right in the button! */}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DemoButton } from "@/components/demo-button";
@@ -24,8 +25,16 @@ export default async function Home() {
   return (
     <main className="section-stagger mx-auto min-h-dvh w-full max-w-3xl px-6 py-14 md:py-20">
       <header>
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-accent/60 px-3 py-1 text-xs font-semibold text-accent-foreground backdrop-blur-xs">
-          <span className="size-1.5 rounded-full bg-primary" /> Study Tracker
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-accent/60 pl-1.5 pr-3 py-1 text-xs font-semibold text-accent-foreground backdrop-blur-xs">
+          <Image
+            src="/logo-icon.png"
+            alt="Logo"
+            width={18}
+            height={18}
+            className="size-4.5 rounded-full object-contain"
+            priority
+          />
+          <span>Study Tracker</span>
         </div>
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl md:leading-[1.15]">
           Track your study time and get a weekly plan built from what you actually do.

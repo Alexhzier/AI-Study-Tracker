@@ -9,6 +9,10 @@ const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-instrument"
 export const metadata: Metadata = {
   title: { default: "Study Tracker", template: "%s · Study Tracker" },
   description: "Log study sessions, track hours, and see your progress.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
