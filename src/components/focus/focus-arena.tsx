@@ -76,7 +76,11 @@ interface FocusArenaProps {
   initialCapabilities: { supported: boolean; version?: number };
 }
 
-export function FocusArena({ subjects, userId, initialCapabilities }: FocusArenaProps) {
+export function FocusArena({
+  subjects = [],
+  userId,
+  initialCapabilities = { supported: false },
+}: FocusArenaProps) {
   const supabase = useMemo(() => createClient(), []);
   const activeSubjects = useMemo(() => subjects.filter((s) => !s.is_archived), [subjects]);
 
@@ -91,7 +95,7 @@ export function FocusArena({ subjects, userId, initialCapabilities }: FocusArena
   // User configuration & local preferences
   const [selectedSubjectId, setSelectedSubjectId] = useState(activeSubjects[0]?.id ?? "");
   const [objective, setObjective] = useState("");
-  const [mode, setMode] = useState<FocusMode>(initialCapabilities.supported ? "pomodoro" : "stopwatch");
+  const [mode, setMode] = useState<FocusMode>(initialCapabilities?.supported ? "pomodoro" : "stopwatch");
   const [selectedPresetId, setSelectedPresetId] = useState("classic");
   const [customFocusMinutes, setCustomFocusMinutes] = useState(25);
   const [customBreakMinutes, setCustomBreakMinutes] = useState(5);
@@ -106,10 +110,14 @@ export function FocusArena({ subjects, userId, initialCapabilities }: FocusArena
       const stored = localStorage.getItem(`study-tracker:focus-prefs:v1:${userId}`);
       if (stored) {
         const prefs = JSON.parse(stored);
-        if (prefs.mode && initialCapabilities.supported) setMode(prefs.mode);
+        if (prefs.mode && initialCapabilities?.supported) setMode(prefs.mode);
         if (prefs.selectedPresetId) setSelectedPresetId(prefs.selectedPresetId);
-        if (prefs.customFocusMinutes) setCustomFocusMinutes(prefs.customFocusMinutes);
-        if (prefs.customBreakMinutes) setCustomBreakMinutes(prefs.customBreakMinutes);
+        if (Number.isFinite(prefs.customFocusMinutes) && prefs.customFocusMinutes > 0) {
+          setCustomFocusMinutes(Math.round(prefs.customFocusMinutes));
+        }
+        if (Number.isFinite(prefs.customBreakMinutes) && prefs.customBreakMinutes > 0) {
+          setCustomBreakMinutes(Math.round(prefs.customBreakMinutes));
+        }
       }
       if (typeof Notification !== "undefined") {
         setNotificationsAllowed(Notification.permission === "granted");
@@ -117,7 +125,7 @@ export function FocusArena({ subjects, userId, initialCapabilities }: FocusArena
     } catch (e) {
       console.warn("Could not load local focus preferences:", e);
     }
-  }, [userId, initialCapabilities.supported]);
+  }, [userId, initialCapabilities?.supported]);
 
   // Save preferences to localStorage
   const savePreferences = useCallback(
@@ -141,7 +149,10 @@ export function FocusArena({ subjects, userId, initialCapabilities }: FocusArena
   const refreshTimerState = useCallback(async () => {
     try {
       const { data, error } = await supabase.rpc("timer_state");
-      if (error || !data) return;
+      if (error || !data) {
+        setIsReady(true);
+        return;
+      }
 
       const normalized = normalizeTimer(data.timer);
       setTimer(normalized);
@@ -234,12 +245,16 @@ export function FocusArena({ subjects, userId, initialCapabilities }: FocusArena
         lastNotifiedPhaseRef.current = phaseKey;
         playFocusChime();
 
-        if (notificationsAllowed && typeof Notification !== "undefined") {
-          const isFocus = timer.phase === "focus";
-          new Notification(isFocus ? "Focus phase completed!" : "Break finished!", {
-            body: isFocus ? "Time to take a well-deserved break." : "Ready to focus again?",
-            icon: "/favicon.ico",
-          });
+        if (notificationsAllowed && typeof Notification !== "undefined" && Notification.permission === "granted") {
+          try {
+            const isFocus = timer.phase === "focus";
+            new Notification(isFocus ? "Focus phase completed!" : "Break finished!", {
+              body: isFocus ? "Time to take a well-deserved break." : "Ready to focus again?",
+              icon: "/favicon.ico",
+            });
+          } catch {
+            // Notification denied or restricted
+          }
         }
 
         // Atomically transition phase on server with concurrency token

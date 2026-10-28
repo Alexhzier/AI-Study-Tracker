@@ -72,9 +72,9 @@ interface FloatingPomodoroProps {
   subjects: Subject[];
 }
 
-export function FloatingPomodoro({ userId, subjects }: FloatingPomodoroProps) {
+export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProps) {
   const supabase = useMemo(() => createClient(), []);
-  const activeSubjects = useMemo(() => subjects.filter((s) => !s.is_archived), [subjects]);
+  const activeSubjects = useMemo(() => (subjects ?? []).filter((s) => !s.is_archived), [subjects]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [timer, setTimer] = useState<TimerRow | null>(null);

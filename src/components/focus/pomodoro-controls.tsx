@@ -49,7 +49,7 @@ interface PomodoroControlsProps {
 
 export function PomodoroControls({
   timer,
-  subjects,
+  subjects = [],
   selectedSubjectId,
   onSubjectChange,
   objective,
@@ -73,7 +73,7 @@ export function PomodoroControls({
 }: PomodoroControlsProps) {
   const [showCustom, setShowCustom] = useState(selectedPresetId === "custom");
 
-  const activeSubjects = subjects.filter((s) => !s.is_archived);
+  const activeSubjects = (subjects ?? []).filter((s) => !s.is_archived);
 
   // If timer is not active, render Setup / Configuration view
   if (!timer || timer.status === "stopped") {

@@ -27,9 +27,9 @@ export default async function FocusPage() {
 
   return (
     <FocusArena
-      subjects={subjects}
+      subjects={subjects ?? []}
       userId={user.id}
-      initialCapabilities={capabilities}
+      initialCapabilities={capabilities ?? { supported: false }}
     />
   );
 }
