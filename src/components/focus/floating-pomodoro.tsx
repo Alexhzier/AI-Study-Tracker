@@ -259,17 +259,17 @@ export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProp
         >
           {/* Header with Title, Fullscreen Link, and Minimize Button */}
           <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-3">
-            <div className="flex items-center gap-2">
-              <span className="relative grid size-6 place-items-center overflow-hidden rounded-md bg-[#0f171b] shadow-xs ring-1 ring-emerald-500/25">
+            <div className="flex items-center gap-2.5">
+              <span className="relative grid size-8 place-items-center overflow-hidden rounded-lg bg-[#0d1417] shadow-xs ring-1 ring-emerald-500/30">
                 <Image
                   src="/logo-icon.png"
                   alt="Pomodoro Focus"
-                  width={24}
-                  height={24}
-                  className="size-full object-contain"
+                  width={32}
+                  height={32}
+                  className="size-full object-contain p-0.5"
                 />
               </span>
-              <span className="text-xs font-bold tracking-tight text-foreground">
+              <span className="text-sm font-bold tracking-tight text-foreground">
                 Pomodoro Focus
               </span>
             </div>
@@ -478,20 +478,20 @@ export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProp
                 )}. Click to expand.`
               : "Open Pomodoro Focus Companion"
           }
-          className={`group flex items-center gap-2 rounded-full p-2.5 shadow-xl transition-all duration-300 cursor-pointer active:scale-95 ${
+          className={`group flex items-center gap-3 rounded-full p-2.5 shadow-2xl transition-all duration-300 cursor-pointer active:scale-95 ${
             isTimerActive
-              ? "bg-card/95 border border-emerald-500/50 text-foreground pl-3 pr-4 ring-2 ring-emerald-500/20 backdrop-blur-md"
-              : "bg-primary text-primary-foreground hover:scale-105 shadow-primary/20 ring-2 ring-primary/20"
+              ? "bg-card/95 border border-emerald-500/50 text-foreground pl-2.5 pr-4 ring-2 ring-emerald-500/20 backdrop-blur-md"
+              : "bg-primary text-primary-foreground hover:scale-105 shadow-primary/25 ring-2 ring-primary/30 pl-2 pr-4.5 py-2"
           }`}
         >
           {/* Logo Brand Emblem */}
-          <span className="relative grid size-6 place-items-center overflow-hidden rounded-full bg-[#0f171b] shadow-xs ring-1 ring-emerald-500/30">
+          <span className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-[#0d1417] shadow-md ring-1 ring-emerald-500/40 shrink-0">
             <Image
               src="/logo-icon.png"
               alt="Pomodoro Focus"
-              width={24}
-              height={24}
-              className="size-full object-contain"
+              width={36}
+              height={36}
+              className="size-full object-contain p-0.5"
             />
           </span>
 
@@ -499,19 +499,19 @@ export function FloatingPomodoro({ userId, subjects = [] }: FloatingPomodoroProp
           {isTimerActive ? (
             <div className="flex items-center gap-2">
               <span
-                className={`size-2 rounded-full ${
+                className={`size-2.5 rounded-full ${
                   isRunning ? "animate-ping" : ""
                 } ${isBreak ? "bg-teal-400" : "bg-emerald-500"}`}
                 aria-hidden="true"
               />
-              <span className="text-xs font-mono font-bold tabular-nums">
+              <span className="text-sm font-mono font-bold tabular-nums">
                 {isPomodoro
                   ? formatClock(progress.phaseRemainingMs)
                   : formatClock(progress.totalElapsedMs)}
               </span>
             </div>
           ) : (
-            <span className="text-xs font-semibold hidden sm:inline-block pr-1">
+            <span className="text-sm font-bold tracking-wide">
               Focus
             </span>
           )}
