@@ -12,56 +12,56 @@
   All text/background pairs below were contrast-tested (>= 4.5:1 for text).
 */
 :root {
-  --radius: 0.375rem;
-  --background: #f5f6f4;
-  --foreground: #151b1d;
+  --radius: 0.5rem;
+  --background: #f8faf9;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #151b1d;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #151b1d;
-  --primary: #2b6b64;
-  --primary-foreground: #f4faf9;
-  --secondary: #eef0ed;
-  --secondary-foreground: #151b1d;
-  --muted: #e9ece8;
-  --muted-foreground: #566265;
-  --accent: #e4eeec;
-  --accent-foreground: #1d4a45;
-  --destructive: #b3372f;
-  --border: #dfe3df;
-  --input: #7c8782;
-  --ring: #2b6b64;
-  --heat-1: #dcebe9;
-  --heat-2: #b4d6d2;
-  --heat-3: #7fb6b0;
-  --heat-4: #4a928b;
-  --heat-4-foreground: #10181a;
+  --popover-foreground: #0f172a;
+  --primary: #0d7a6e;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f4f3;
+  --secondary-foreground: #0f172a;
+  --muted: #edf2f0;
+  --muted-foreground: #5c6e6b;
+  --accent: #e5f4f1;
+  --accent-foreground: #0a564d;
+  --destructive: #dc2626;
+  --border: #e2e8e5;
+  --input: #8fa09d;
+  --ring: #0d7a6e;
+  --heat-1: #d5f4ee;
+  --heat-2: #84dfd0;
+  --heat-3: #2cb5a1;
+  --heat-4: #0d7a6e;
+  --heat-4-foreground: #ffffff;
 }
 
 .dark {
-  --background: #111617;
-  --foreground: #f1f4f2;
-  --card: #182022;
-  --card-foreground: #f1f4f2;
-  --popover: #222b2d;
-  --popover-foreground: #f1f4f2;
-  --primary: #70b7ac;
-  --primary-foreground: #0e1a18;
-  --secondary: #222b2d;
-  --secondary-foreground: #f1f4f2;
-  --muted: #232d2f;
-  --muted-foreground: #aab7b8;
-  --accent: #1f2d2c;
-  --accent-foreground: #d4e8e4;
-  --destructive: #ee7b72;
-  --border: #304043;
-  --input: #5e7578;
-  --ring: #70b7ac;
-  --heat-1: #1d3532;
-  --heat-2: #2a4d49;
-  --heat-3: #356d66;
-  --heat-4: #70b7ac;
-  --heat-4-foreground: #0e1a18;
+  --background: #0b1112;
+  --foreground: #f8fafc;
+  --card: #121a1b;
+  --card-foreground: #f8fafc;
+  --popover: #172224;
+  --popover-foreground: #f8fafc;
+  --primary: #2dd4bf;
+  --primary-foreground: #042f2e;
+  --secondary: #182325;
+  --secondary-foreground: #f8fafc;
+  --muted: #1c282a;
+  --muted-foreground: #94a7a8;
+  --accent: #172d2b;
+  --accent-foreground: #5eead4;
+  --destructive: #f87171;
+  --border: #233134;
+  --input: #3e5256;
+  --ring: #2dd4bf;
+  --heat-1: #134e4a;
+  --heat-2: #0d9488;
+  --heat-3: #14b8a6;
+  --heat-4: #2dd4bf;
+  --heat-4-foreground: #042f2e;
 }
 
 @theme inline {
@@ -92,6 +92,7 @@
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
 @theme {
@@ -103,20 +104,37 @@
   --text-display--line-height: 1;
   --text-display--letter-spacing: -0.03em;
 
-  /* One elevation language: borders, not shadows. */
-  --shadow-xs: 0 0 #0000;
-  --shadow-sm: 0 0 #0000;
+  /* Subtle, modern ambient elevation */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
 
   /* Motion: quick and predictable. */
   --default-transition-duration: 150ms;
   --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
+@keyframes section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer base {
   * { @apply border-border outline-ring/50; }
-  html { -webkit-text-size-adjust: 100%; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground antialiased;
+    background-image: radial-gradient(ellipse 80% 45% at 50% -15%, color-mix(in srgb, var(--primary) 8%, transparent), transparent);
+    background-attachment: fixed;
     font-feature-settings: "tnum" 1, "cv11" 1;
     text-rendering: optimizeLegibility;
   }
@@ -134,4 +152,23 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Seamless section choreography & visual connectors */
+.section-fade {
+  animation: section-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.section-stagger > * {
+  animation: section-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.section-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.section-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.section-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.section-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.section-stagger > *:nth-child(5) { animation-delay: 160ms; }
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 15%, var(--border) 85%, transparent);
 }

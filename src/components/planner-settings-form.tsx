@@ -42,9 +42,9 @@ export function PlannerSettingsForm({ weeklyGoalMinutes, availability, subjects 
   }
 
   return (
-    <form onSubmit={submit} className="space-y-8">
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold">Weekly goal</h2>
+    <form onSubmit={submit} className="space-y-6">
+      <section className="rounded-xl border border-border/80 bg-card p-4 shadow-xs sm:p-5 space-y-2.5">
+        <h2 className="text-sm font-semibold tracking-tight">Weekly goal</h2>
         <div className="flex items-center gap-2">
           <input aria-label="Weekly goal in hours" type="number" min={0} max={168} step={0.5} inputMode="decimal" placeholder="e.g. 10"
             value={goal} onChange={(e) => setGoal(e.target.value)} className={`${fieldClass} max-w-32`} />
@@ -54,12 +54,14 @@ export function PlannerSettingsForm({ weeklyGoalMinutes, availability, subjects 
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold">Available study time</h2>
-        <p className="text-xs text-muted-foreground">Hours you can study on each day. Leave a day empty if you can&rsquo;t study.</p>
-        <ul className="divide-y rounded-lg border bg-card">
+        <div className="px-1">
+          <h2 className="text-sm font-semibold tracking-tight">Available study time</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">Hours you can study on each day. Leave a day empty if you can&rsquo;t study.</p>
+        </div>
+        <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs">
           {DAYS.map(([d, name]) => (
-            <li key={d} className="flex items-center justify-between gap-3 px-4 py-2">
-              <label htmlFor={`day-${d}`} className="text-sm">{name}</label>
+            <li key={d} className="flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/25">
+              <label htmlFor={`day-${d}`} className="text-sm font-medium">{name}</label>
               <div className="flex items-center gap-2">
                 <input id={`day-${d}`} type="number" min={0} max={24} step={0.5} inputMode="decimal" placeholder="0"
                   value={avail[d]} onChange={(e) => setAvail({ ...avail, [d]: e.target.value })} className={`${fieldClass} h-9 w-24`} />
@@ -71,17 +73,19 @@ export function PlannerSettingsForm({ weeklyGoalMinutes, availability, subjects 
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold">Subject priority</h2>
-        <p className="text-xs text-muted-foreground">1 is lowest and 5 is highest. Higher-priority subjects get more of your time.</p>
+        <div className="px-1">
+          <h2 className="text-sm font-semibold tracking-tight">Subject priority</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">1 is lowest and 5 is highest. Higher-priority subjects get more of your time.</p>
+        </div>
         {subjects.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Add subjects first to set their priority.</p>
+          <p className="px-1 text-sm text-muted-foreground">Add subjects first to set their priority.</p>
         ) : (
-          <ul className="divide-y rounded-lg border bg-card">
+          <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs">
             {subjects.map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-2">
+              <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/25">
                 <span className="flex min-w-0 items-center gap-2 text-sm">
                   <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} aria-hidden />
-                  <span className="truncate">{s.name}</span>
+                  <span className="truncate font-medium">{s.name}</span>
                 </span>
                 <select aria-label={`Priority for ${s.name}`} value={prio[s.id]} onChange={(e) => setPrio({ ...prio, [s.id]: Number(e.target.value) })} className={`${fieldClass} h-9 w-24`}>
                   {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}

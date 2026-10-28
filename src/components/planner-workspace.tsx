@@ -162,17 +162,17 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* 1. Choose a week and generate */}
-      <Panel aria-label="Generate a plan" className="p-4">
+      <Panel aria-label="Generate a plan" className="p-4 sm:p-5">
         <fieldset disabled={Boolean(draft) || generating}>
-          <legend className="text-sm font-medium">Week to plan</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <legend className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Week to plan</legend>
+          <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
             {weeks.map((w) => (
               <label key={w.key} className="relative cursor-pointer">
                 <input type="radio" name="week" value={w.key} checked={weekKey === w.key} onChange={() => setWeekKey(w.key)} className="peer sr-only" />
-                <span className="block rounded-md border border-input px-3 py-2 transition-colors peer-checked:border-primary peer-checked:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-60">
-                  <span className="block text-sm font-medium">{w.name}</span>
+                <span className="block rounded-xl border border-border/80 bg-background/50 px-3.5 py-2.5 transition-all duration-150 hover:border-primary/40 peer-checked:border-primary peer-checked:bg-accent/70 peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-60">
+                  <span className="block text-sm font-semibold text-foreground">{w.name}</span>
                   <span className="block text-xs text-muted-foreground">{w.range}{w.approved ? " · plan approved" : ""}</span>
                 </span>
               </label>
@@ -180,7 +180,7 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
           </div>
         </fieldset>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/60 pt-4">
           {!enabled ? (
             <p className="text-sm text-muted-foreground">Live generation isn&rsquo;t enabled on this deployment.</p>
           ) : subjects.length === 0 ? (
@@ -212,7 +212,7 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
 
       {/* Errors from generating: calm, specific, with a way forward */}
       {genError && (
-        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3">
+        <div role="alert" className="section-fade flex flex-wrap items-center justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3">
           <div className="min-w-0">
             <p className="text-sm font-medium text-destructive">Couldn&rsquo;t build a plan</p>
             <p className="mt-0.5 text-sm">{genError}</p>
@@ -223,34 +223,34 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
 
       {/* 2. Generating */}
       {generating && (
-        <Panel aria-busy="true" aria-label="Building your plan" className="p-4">
-          <p className="text-sm font-medium">Building your plan</p>
+        <Panel aria-busy="true" aria-label="Building your plan" className="section-fade p-4 sm:p-5">
+          <p className="text-sm font-semibold">Building your plan</p>
           <p className="mt-0.5 text-sm text-muted-foreground">This usually takes 10 to 30 seconds. You can stay on this page.</p>
           <div className="mt-4 space-y-3 animate-pulse" aria-hidden>
-            <div className="h-24 rounded-md bg-muted" />
-            <div className="h-14 rounded-md bg-muted" />
-            <div className="h-14 rounded-md bg-muted" />
+            <div className="h-24 rounded-lg bg-muted/70" />
+            <div className="h-14 rounded-lg bg-muted/70" />
+            <div className="h-14 rounded-lg bg-muted/70" />
           </div>
         </Panel>
       )}
 
       {/* 3. Draft: proposed by the AI, not yet on the calendar */}
       {draft && !generating && (
-        <section aria-label="Draft plan" className="space-y-4">
-          <Panel>
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
+        <section aria-label="Draft plan" className="section-fade space-y-4">
+          <Panel className="overflow-hidden">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 bg-secondary/20 p-4 sm:px-5">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <Tag tone="draft">Draft</Tag>
                   <span className="text-xs text-muted-foreground">Not on your calendar yet</span>
                 </div>
-                <h2 className="mt-2 text-sm font-semibold">Plan for {week.name.toLowerCase()} ({week.range})</h2>
+                <h2 className="mt-2 text-sm font-semibold tracking-tight">Plan for {week.name.toLowerCase()} ({week.range})</h2>
                 <p className="mt-1 max-w-prose text-sm text-muted-foreground">{draft.summary}</p>
               </div>
               {draftActions}
             </div>
 
-            <div className="space-y-3 p-4">
+            <div className="space-y-3 p-4 sm:p-5">
               <WeekStrip
                 days={weekDates(draft.weekStart).map((d) => ({
                   label: format(parseISO(d), "EEE"),
@@ -259,7 +259,7 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
                   muted: d < today,
                 }))}
               />
-              {draft.notes && <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">{draft.notes}</p>}
+              {draft.notes && <p className="rounded-lg bg-muted/70 px-3 py-2 text-xs text-muted-foreground">{draft.notes}</p>}
               {draft.warnings.length > 0 && (
                 <ul className="list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
                   {draft.warnings.map((w) => <li key={w}>{w}</li>)}
@@ -278,8 +278,8 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
             const over = minutes > cap;
             if (items.length === 0 && cap === 0) return null;
             return (
-              <Panel key={date} aria-label={dayLabel(date)}>
-                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-2.5">
+              <Panel key={date} aria-label={dayLabel(date)} className="overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border/60 bg-secondary/15 px-4 py-2.5 sm:px-5">
                   <div className="flex items-baseline gap-3">
                     <h3 className="text-sm font-semibold">{dayLabel(date)}</h3>
                     <span className={`text-xs tabular-nums ${over ? "text-destructive" : "text-muted-foreground"}`}>
@@ -295,11 +295,11 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
                 </div>
 
                 {items.length === 0 ? (
-                  <p className="px-4 py-3 text-xs text-muted-foreground">Nothing planned for this day.</p>
+                  <p className="px-4 py-3 text-xs text-muted-foreground sm:px-5">Nothing planned for this day.</p>
                 ) : (
-                  <ul className="divide-y">
+                  <ul className="divide-y divide-border/60">
                     {items.map((it) => (
-                      <li key={it.id} className="space-y-2 px-4 py-3">
+                      <li key={it.id} className="space-y-2 px-4 py-3 transition-colors hover:bg-secondary/20 sm:px-5">
                         <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1.2fr_1.2fr_1fr_6.5rem_auto]">
                           <select aria-label="Subject" value={it.subject_id} onChange={(e) => update(it.id, { subject_id: e.target.value })} className={compact}>
                             {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -343,11 +343,15 @@ export function PlannerWorkspace({ subjects, weeks, enabled, remaining, limit, h
       )}
 
       {/* 4. Approved: this is what is on the calendar */}
-      {!draft && !generating && week.approved && <ApprovedView week={week} subjects={subjects} />}
+      {!draft && !generating && week.approved && (
+        <div key={week.key} className="section-fade">
+          <ApprovedView week={week} subjects={subjects} />
+        </div>
+      )}
 
       {/* Empty state */}
       {!draft && !generating && !week.approved && !genError && canGenerate && (
-        <div className="rounded-lg border border-dashed px-6 py-12 text-center">
+        <div key={`empty-${week.key}`} className="section-fade rounded-xl border border-dashed border-border/80 bg-card/40 px-6 py-12 text-center">
           <h2 className="text-sm font-semibold">No plan for {week.name.toLowerCase()} yet</h2>
           <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
             Generate a draft from your goals, availability and history. You&rsquo;ll review and edit it before anything is added to your calendar.
@@ -366,15 +370,15 @@ function ApprovedView({ week, subjects }: { week: WeekOption; subjects: Subject[
   const first = dates[0] ?? week.weekStart;
 
   return (
-    <Panel aria-label="Approved plan">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
+    <Panel aria-label="Approved plan" className="overflow-hidden">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 bg-secondary/20 p-4 sm:px-5">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Tag tone="approved">Approved</Tag>
             {isSample && <Tag tone="sample">Sample plan</Tag>}
             <span className="text-xs text-muted-foreground">On your calendar</span>
           </div>
-          <h2 className="mt-2 text-sm font-semibold">{week.name} ({week.range})</h2>
+          <h2 className="mt-2 text-sm font-semibold tracking-tight">{week.name} ({week.range})</h2>
           {plan.summary && <p className="mt-1 max-w-prose text-sm text-muted-foreground">{plan.summary}</p>}
           {isSample && <p className="mt-1 text-xs text-muted-foreground">Created with the demo data, not by the AI. Generate a plan to see live output.</p>}
         </div>
@@ -395,7 +399,7 @@ function ApprovedView({ week, subjects }: { week: WeekOption; subjects: Subject[
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 sm:p-5">
         <WeekStrip
           days={weekDates(week.weekStart).map((d) => ({
             label: format(parseISO(d), "EEE"),
@@ -405,10 +409,10 @@ function ApprovedView({ week, subjects }: { week: WeekOption; subjects: Subject[
         />
       </div>
 
-      <div className="divide-y border-t">
+      <div className="divide-y divide-border/60 border-t border-border/60">
         {dates.map((d) => (
-          <div key={d} className="px-4 py-3">
-            <h3 className="text-xs font-medium text-muted-foreground">{dayLabel(d)}</h3>
+          <div key={d} className="px-4 py-3.5 transition-colors hover:bg-secondary/20 sm:px-5">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{dayLabel(d)}</h3>
             <ul className="mt-2 space-y-2.5">
               {plan.items.filter((i) => i.date === d).map((i, idx) => {
                 const s = subjects.find((x) => x.id === i.subject_id);
@@ -417,7 +421,7 @@ function ApprovedView({ week, subjects }: { week: WeekOption; subjects: Subject[
                     <div className="flex items-baseline justify-between gap-3 text-sm">
                       <span className="flex min-w-0 items-center gap-2">
                         <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: s?.color ?? "#999" }} aria-hidden />
-                        <span className="truncate">{s?.name ?? "Subject"}{i.topic ? ` · ${i.topic}` : ""}</span>
+                        <span className="truncate font-medium">{s?.name ?? "Subject"}{i.topic ? ` · ${i.topic}` : ""}</span>
                       </span>
                       <span className="shrink-0 tabular-nums text-muted-foreground">{formatMinutes(i.duration_minutes)}</span>
                     </div>

@@ -49,9 +49,9 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       <PageHeader title="Analytics" description="Weeks run Monday to Sunday." />
 
       {insights.length > 0 && (
-        <Panel aria-labelledby="insights-h" className="mb-4">
+        <Panel aria-labelledby="insights-h" className="mb-5 bg-gradient-to-br from-accent/30 via-card to-card">
           <PanelHeader id="insights-h" title="At a glance" />
-          <ul className="grid gap-x-10 gap-y-3 p-4 md:grid-cols-2">
+          <ul className="grid gap-x-10 gap-y-3 p-4 sm:p-5 md:grid-cols-2">
             {insights.map((i) => (
               <li key={i.id} className="text-sm leading-relaxed text-muted-foreground">
                 <strong className="font-semibold text-foreground">{i.lead}</strong>
@@ -62,8 +62,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </Panel>
       )}
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Panel aria-labelledby="daily-h">
+      <div className="grid gap-5 xl:grid-cols-2">
+        <Panel aria-labelledby="daily-h" className="overflow-hidden">
           <PanelHeader
             id="daily-h" title="Daily hours"
             action={
@@ -82,25 +82,27 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
               </div>
             }
           />
-          <div className="p-4">
+          <div key={weekStart} className="section-fade p-4 sm:p-5">
             <HoursBarChart data={daily} label="Daily study time for the selected week" />
           </div>
-          <p className="border-t px-4 py-2.5 text-xs text-muted-foreground">Week total: {formatMinutes(weekTotal)}</p>
+          <p className="border-t border-border/60 bg-secondary/20 px-4 py-2.5 text-xs text-muted-foreground sm:px-5">
+            Week total: <span className="font-semibold text-foreground tabular-nums">{formatMinutes(weekTotal)}</span>
+          </p>
         </Panel>
 
         <Panel aria-labelledby="weekly-h">
           <PanelHeader id="weekly-h" title="Weekly hours" action={<span className="text-xs text-muted-foreground">Last 12 weeks</span>} />
-          <div className="p-4"><HoursBarChart data={recentWeeks(rows, today)} label="Weekly study time for the last 12 weeks" /></div>
+          <div className="p-4 sm:p-5"><HoursBarChart data={recentWeeks(rows, today)} label="Weekly study time for the last 12 weeks" /></div>
         </Panel>
 
         <Panel aria-labelledby="subject-h">
           <PanelHeader id="subject-h" title="Time by subject" action={<span className="text-xs text-muted-foreground">All time</span>} />
-          <div className="p-4"><SubjectPie data={subjectDistribution(rows, subjects)} /></div>
+          <div className="p-4 sm:p-5"><SubjectPie data={subjectDistribution(rows, subjects)} /></div>
         </Panel>
 
         <Panel aria-labelledby="monthly-h">
           <PanelHeader id="monthly-h" title="Monthly hours" action={<span className="text-xs text-muted-foreground">Last 12 months</span>} />
-          <div className="p-4"><HoursBarChart data={recentMonths(rows, today)} label="Study time by month for the last 12 months" /></div>
+          <div className="p-4 sm:p-5"><HoursBarChart data={recentMonths(rows, today)} label="Study time by month for the last 12 months" /></div>
         </Panel>
       </div>
     </PageContainer>

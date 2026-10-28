@@ -8,9 +8,9 @@ const tick = { fill: "var(--muted-foreground)", fontSize: 12 };
 
 function TipBox({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-md border bg-popover px-3 py-2 text-xs text-popover-foreground">
-      <p className="font-medium">{title}</p>
-      <p className="mt-0.5 tabular-nums text-muted-foreground">{value}</p>
+    <div className="rounded-lg border border-border/80 bg-popover/95 px-3.5 py-2 text-xs text-popover-foreground shadow-md backdrop-blur-xs">
+      <p className="font-semibold text-foreground">{title}</p>
+      <p className="mt-0.5 tabular-nums font-medium text-muted-foreground">{value}</p>
     </div>
   );
 }
@@ -35,16 +35,16 @@ export function HoursBarChart({
         <div className="h-56 w-full sm:h-64" role="img" aria-label={label}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }} barCategoryGap="22%">
-              <CartesianGrid vertical={false} stroke="var(--border)" />
+              <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.6} strokeDasharray="3 3" />
               <XAxis dataKey="label" tick={tick} tickLine={false} axisLine={{ stroke: "var(--border)" }} tickMargin={8} interval="preserveStartEnd" minTickGap={14} />
               <YAxis
                 tick={tick} tickLine={false} axisLine={false} width={54} tickCount={4}
                 tickFormatter={(v) => formatMinutes(Math.round(Number(v) * 60))}
               />
-              <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.5 }} content={<BarTip />} />
-              <Bar dataKey="hours" radius={[3, 3, 0, 0]} maxBarSize={40}>
+              <Tooltip cursor={{ fill: "var(--muted)", opacity: 0.4 }} content={<BarTip />} />
+              <Bar dataKey="hours" radius={[5, 5, 0, 0]} maxBarSize={38}>
                 {data.map((d, i) => (
-                  <Cell key={i} fill="var(--primary)" fillOpacity={!hasCurrent || d.current ? 1 : 0.55} />
+                  <Cell key={i} fill="var(--primary)" fillOpacity={!hasCurrent || d.current ? 1 : 0.45} />
                 ))}
               </Bar>
             </BarChart>
@@ -76,7 +76,7 @@ export function SubjectPie({ data }: { data: SubjectSlice[] }) {
       <div className="relative size-48 shrink-0" role="img" aria-label="Study time by subject">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="minutes" nameKey="name" innerRadius="64%" outerRadius="96%" stroke="var(--card)" strokeWidth={2} startAngle={90} endAngle={-270}>
+            <Pie data={data} dataKey="minutes" nameKey="name" innerRadius="68%" outerRadius="96%" stroke="var(--card)" strokeWidth={3} startAngle={90} endAngle={-270}>
               {data.map((s) => <Cell key={s.name} fill={s.color} />)}
             </Pie>
             <Tooltip content={<SliceTip total={total} />} />
@@ -84,8 +84,8 @@ export function SubjectPie({ data }: { data: SubjectSlice[] }) {
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
           <div>
-            <p className="text-xs text-muted-foreground">Total</p>
-            <p className="text-lg font-semibold tabular-nums">{formatMinutes(total)}</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total</p>
+            <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">{formatMinutes(total)}</p>
           </div>
         </div>
       </div>

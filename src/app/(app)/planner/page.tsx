@@ -72,8 +72,8 @@ export default async function PlannerPage() {
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 space-y-4">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="min-w-0 space-y-5">
           {(isGuest || !cfg.enabled) && <PlannerExplainer isGuest={isGuest} />}
           <PlannerWorkspace
             subjects={active}

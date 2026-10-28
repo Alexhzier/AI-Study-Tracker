@@ -9,5 +9,5 @@ const SIZES = {
 } as const;
 
 export function PageContainer({ size = "default", children }: { size?: keyof typeof SIZES; children: React.ReactNode }) {
-  return <div className={cn("mx-auto w-full", SIZES[size])}>{children}</div>;
+  return <div className={cn("section-stagger mx-auto w-full", SIZES[size])}>{children}</div>;
 }

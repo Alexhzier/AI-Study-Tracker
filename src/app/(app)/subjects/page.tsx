@@ -40,13 +40,13 @@ export default async function SubjectsPage() {
     const t = totals.get(s.id) ?? { minutes: 0, count: 0 };
     const week = weekBySubject.get(s.id);
     return (
-      <li key={s.id} className="group flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 sm:flex-nowrap">
-        <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: s.color }} aria-hidden />
+      <li key={s.id} className="group flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 transition-colors hover:bg-secondary/40 sm:flex-nowrap">
+        <span className="size-3 shrink-0 rounded-full transition-transform group-hover:scale-110" style={{ backgroundColor: s.color }} aria-hidden />
         <div className="min-w-0 flex-1 basis-40">
           <Link
             href={`/sessions?subject=${s.id}`}
             aria-label={`${s.name}: view sessions`}
-            className={cn("block truncate text-sm font-medium underline-offset-4 hover:underline", s.is_archived && "text-muted-foreground")}
+            className={cn("block truncate text-sm font-semibold underline-offset-4 hover:underline", s.is_archived && "text-muted-foreground")}
           >
             {s.name}
           </Link>
@@ -68,7 +68,7 @@ export default async function SubjectsPage() {
           </div>
         )}
 
-        <p className="w-20 shrink-0 text-right text-sm tabular-nums">{formatMinutes(t.minutes)}</p>
+        <p className="w-20 shrink-0 text-right text-sm font-medium tabular-nums">{formatMinutes(t.minutes)}</p>
 
         <div className="flex shrink-0 gap-0.5 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
           <SubjectDialog subject={s}>
@@ -101,7 +101,7 @@ export default async function SubjectsPage() {
       />
 
       {subjects.length === 0 ? (
-        <div className="rounded-lg border border-dashed px-6 py-14 text-center">
+        <div className="rounded-xl border border-dashed border-border/80 bg-card/40 px-6 py-14 text-center">
           <h2 className="text-sm font-semibold">Create your first subject</h2>
           <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
             Subjects group your study sessions so you can see where your time goes. Add one for each course or topic.
@@ -113,18 +113,21 @@ export default async function SubjectsPage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           <section aria-label="Active subjects">
             {active.length === 0 ? (
               <p className="text-sm text-muted-foreground">All your subjects are archived. Create a new one or restore one below.</p>
             ) : (
-              <Panel><ul className="divide-y">{active.map(row)}</ul></Panel>
+              <Panel className="overflow-hidden"><ul className="divide-y divide-border/60">{active.map(row)}</ul></Panel>
             )}
           </section>
           {archived.length > 0 && (
             <section aria-labelledby="arch-h">
-              <h2 id="arch-h" className="mb-2 px-1 text-xs text-muted-foreground">Archived</h2>
-              <Panel><ul className="divide-y">{archived.map(row)}</ul></Panel>
+              <div className="mb-2.5 flex items-center gap-3 px-1">
+                <h2 id="arch-h" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Archived</h2>
+                <div className="h-px flex-1 bg-border/60" aria-hidden />
+              </div>
+              <Panel className="overflow-hidden opacity-85 transition-opacity hover:opacity-100"><ul className="divide-y divide-border/60">{archived.map(row)}</ul></Panel>
             </section>
           )}
         </div>

@@ -38,14 +38,14 @@ export function ExamsManager({ exams, subjects }: { exams: Exam[]; subjects: Sub
   return (
     <div className="space-y-4">
       {exams.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No exams yet. The planner only uses exam dates you add here.</p>
+        <p className="px-1 text-sm text-muted-foreground">No exams yet. The planner only uses exam dates you add here.</p>
       ) : (
-        <ul className="divide-y rounded-lg border bg-card">
+        <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs">
           {exams.map((x) => {
             const s = subjects.find((y) => y.id === x.subject_id);
             const past = x.exam_date < today;
             return (
-              <li key={x.id} className={`flex items-center gap-3 px-4 py-2.5 ${past ? "opacity-60" : ""}`}>
+              <li key={x.id} className={`flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/25 ${past ? "opacity-60" : ""}`}>
                 <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: s?.color ?? "#999" }} aria-hidden />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{x.title} · {s?.name ?? "Subject"}</p>
@@ -68,7 +68,7 @@ export function ExamsManager({ exams, subjects }: { exams: Exam[]; subjects: Sub
       )}
 
       {active.length > 0 && (
-        <form ref={formRef} onSubmit={submit} className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
+        <form ref={formRef} onSubmit={submit} className="grid gap-3 rounded-xl border border-border/80 bg-card p-4 shadow-xs sm:grid-cols-2 sm:p-5">
           <div className="space-y-1.5">
             <label htmlFor="exam-subject" className="text-sm font-medium">Subject</label>
             <select id="exam-subject" name="subject_id" required className={fieldClass}>

@@ -51,27 +51,27 @@ export default async function SessionsPage({
       />
 
       {sessions.length === 0 ? (
-        <div className="rounded-lg border border-dashed px-6 py-12 text-center">
+        <div className="rounded-xl border border-dashed border-border/80 bg-card/40 px-6 py-12 text-center">
           <p className="text-sm text-muted-foreground">
             {subjectId ? "No sessions for this subject yet." : "No sessions logged yet. Use “Log session” to add your first one."}
           </p>
         </div>
       ) : (
-        <div className="relative space-y-6 md:space-y-8 md:before:absolute md:before:inset-y-1 md:before:left-[8.75rem] md:before:w-px md:before:bg-border">
+        <div className="relative space-y-6 md:space-y-7 md:before:absolute md:before:inset-y-1 md:before:left-[8.75rem] md:before:w-px md:before:bg-gradient-to-b md:before:from-primary/50 md:before:via-border md:before:to-transparent">
           {[...groups.entries()].map(([date, list]) => (
             <section key={date} aria-label={`${dayName(date)}, ${dayDate(date)}`} className="md:grid md:grid-cols-[8rem_minmax(0,1fr)] md:gap-6">
               <div className="relative mb-2 flex items-baseline justify-between md:mb-0 md:block md:pt-0.5">
                 <div>
-                  <h2 className="text-sm font-semibold">{dayName(date)}</h2>
+                  <h2 className="text-sm font-semibold tracking-tight">{dayName(date)}</h2>
                   <p className="text-xs text-muted-foreground">{dayDate(date)}</p>
                 </div>
-                <p className="text-sm tabular-nums text-muted-foreground md:mt-2">
+                <p className="text-sm font-medium tabular-nums text-muted-foreground md:mt-2">
                   {formatMinutes(list.reduce((n, s) => n + s.duration_minutes, 0))}
                 </p>
-                <span aria-hidden className="absolute left-[8.5rem] top-2 hidden size-2 rounded-full bg-primary md:block" />
+                <span aria-hidden className="absolute left-[8.5rem] top-2 hidden size-2 rounded-full bg-primary ring-4 ring-background md:block" />
               </div>
-              <Panel>
-                <ul className="divide-y">
+              <Panel className="overflow-hidden">
+                <ul className="divide-y divide-border/60">
                   {list.map((s) => <SessionRow key={s.id} session={s} subjects={subjects} />)}
                 </ul>
               </Panel>

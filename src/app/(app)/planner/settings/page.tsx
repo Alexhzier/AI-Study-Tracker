@@ -20,14 +20,15 @@ export default async function PlannerSettingsPage() {
         description="The planner only uses what you enter here and what you've logged. It never guesses exam dates."
         action={<Link href="/planner" className="text-sm text-muted-foreground underline-offset-4 hover:underline">Back to planner</Link>}
       />
-      <div className="space-y-10">
+      <div className="space-y-8">
         <PlannerSettingsForm
           weeklyGoalMinutes={settings.weeklyGoalMinutes}
           availability={settings.availability}
           subjects={active.map((s) => ({ id: s.id, name: s.name, color: s.color, priority: settings.priorities[s.id] ?? 3 }))}
         />
+        <div className="section-divider" aria-hidden />
         <section aria-labelledby="exams-h" className="space-y-3">
-          <h2 id="exams-h" className="text-sm font-semibold">Upcoming exams</h2>
+          <h2 id="exams-h" className="px-1 text-sm font-semibold tracking-tight">Upcoming exams</h2>
           <ExamsManager exams={exams} subjects={subjects} />
         </section>
       </div>

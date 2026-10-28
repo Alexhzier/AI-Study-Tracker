@@ -17,16 +17,16 @@ export function SessionRow({
   const meta = [showDate ? format(parseISO(session.session_date), "MMM d") : null, times].filter(Boolean).join(" · ");
 
   return (
-    <li className="group flex items-center gap-3 px-4 py-2.5">
-      <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: subject?.color ?? "#999" }} aria-hidden />
+    <li className="group flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/40">
+      <span className="size-2.5 shrink-0 rounded-full ring-2 ring-transparent transition-transform group-hover:scale-110" style={{ backgroundColor: subject?.color ?? "#999" }} aria-hidden />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <p className="truncate text-sm font-medium">{subject?.name ?? "Unknown subject"}</p>
+          <p className="truncate text-sm font-semibold text-foreground">{subject?.name ?? "Unknown subject"}</p>
           {meta && <span className="shrink-0 text-xs text-muted-foreground">{meta}</span>}
         </div>
         {session.notes && <p className="truncate text-xs text-muted-foreground">{session.notes}</p>}
       </div>
-      <p className="w-16 shrink-0 text-right text-sm tabular-nums">{formatMinutes(session.duration_minutes)}</p>
+      <p className="w-16 shrink-0 text-right text-sm font-medium tabular-nums text-foreground">{formatMinutes(session.duration_minutes)}</p>
       <div className="flex shrink-0 gap-0.5 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
         <SessionDialog subjects={subjects} session={session}>
           <Button variant="ghost" size="icon" aria-label="Edit session" className="size-8 text-muted-foreground">

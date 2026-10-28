@@ -98,9 +98,9 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
     });
   }
 
-  const shell = "h-full rounded-lg border bg-card p-5 lg:p-6";
+  const shell = "h-full rounded-xl border border-border/80 bg-card p-5 shadow-xs transition-shadow lg:p-6";
 
-  if (!ready) return <div className="min-h-40 rounded-lg border bg-card" aria-hidden />;
+  if (!ready) return <div className="min-h-40 rounded-xl border border-border/80 bg-card" aria-hidden />;
 
   if (loadError && !timer) {
     return (
@@ -117,7 +117,7 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
       return (
         <section aria-label="Study timer" className={shell}>
           <p className="text-sm text-muted-foreground">
-            <Link href="/subjects" className="font-medium text-foreground underline underline-offset-4">Add a subject</Link>{" "}
+            <Link href="/subjects" className="font-semibold text-foreground underline underline-offset-4">Add a subject</Link>{" "}
             to start the study timer.
           </p>
         </section>
@@ -125,7 +125,7 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
     }
     return (
       <section aria-label="Study timer" className={shell}>
-        <p className="mb-3 text-sm text-muted-foreground">Study timer</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Study timer</p>
         <div className="flex flex-col gap-3">
           <div>
             <label htmlFor="timer-subject" className="sr-only">Subject</label>
@@ -151,9 +151,9 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
   if (timer.status === "stopped") {
     const minutes = Math.round(timer.accumulated_ms / 60000);
     return (
-      <section aria-label="Save study session" className={`${shell} space-y-3`}>
+      <section aria-label="Save study session" className={`${shell} space-y-3.5`}>
         <div className="flex items-baseline justify-between gap-3">
-          <p className="flex items-center gap-2 text-sm font-medium">{dot}{subject?.name ?? "Unknown subject"}</p>
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">{dot}{subject?.name ?? "Unknown subject"}</p>
           <p className="text-sm tabular-nums text-muted-foreground">
             {minutes >= 1 ? `${formatMinutes(minutes)} studied` : "Less than a minute"}
           </p>
@@ -161,13 +161,13 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
         <textarea aria-label="Session notes" placeholder="Notes (optional)" rows={2} maxLength={2000}
           value={notes} onChange={(e) => setNotes(e.target.value)} className={textareaClass} />
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-1">
           <Button variant="ghost" disabled={pending}
             onClick={() => {
               if (!confirm("Discard this session? The time won't be saved.")) return;
               act(() => timerDiscard(), () => setNotes(""));
             }}>
-            Discard
+              Discard
           </Button>
           <Button disabled={pending || minutes < 1}
             onClick={() => act(() => timerSave(notes.trim() || undefined), () => { toast.success("Session saved"); setNotes(""); })}>
@@ -187,10 +187,16 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             {dot}
-            <span className="truncate">{subject?.name ?? "Unknown subject"}</span>
+            <span className="truncate font-medium text-foreground">{subject?.name ?? "Unknown subject"}</span>
             <span aria-live="polite">· {running ? "Running" : "Paused"}</span>
+            {running && (
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+              </span>
+            )}
           </p>
-          <p role="timer" className={`mt-0.5 text-display font-semibold tabular-nums ${running ? "" : "text-muted-foreground"}`}>
+          <p role="timer" className={`mt-1 text-display font-bold font-mono tracking-tight tabular-nums ${running ? "text-foreground" : "text-muted-foreground/80"}`}>
             {clock(ms)}
           </p>
         </div>

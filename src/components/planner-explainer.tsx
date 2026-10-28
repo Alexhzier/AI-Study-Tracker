@@ -8,18 +8,20 @@ const STEPS = [
 
 export function PlannerExplainer({ isGuest }: { isGuest: boolean }) {
   return (
-    <Panel aria-labelledby="how-h">
+    <Panel aria-labelledby="how-h" className="overflow-hidden">
       <PanelHeader id="how-h" title="How the planner works" />
-      <ol className="grid gap-5 p-4 md:grid-cols-3">
+      <ol className="grid divide-y divide-border/60 md:grid-cols-3 md:divide-x md:divide-y-0">
         {STEPS.map(([title, body], i) => (
-          <li key={title}>
-            <p className="text-xs tabular-nums text-muted-foreground">Step {i + 1}</p>
-            <p className="mt-0.5 text-sm font-medium">{title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+          <li key={title} className="p-4 sm:p-5 transition-colors hover:bg-secondary/25">
+            <span className="inline-flex items-center rounded-md bg-accent/80 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-accent-foreground">
+              Step {i + 1}
+            </span>
+            <p className="mt-2 text-sm font-semibold text-foreground">{title}</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{body}</p>
           </li>
         ))}
       </ol>
-      <p className="border-t px-4 py-3 text-xs text-muted-foreground">
+      <p className="border-t border-border/60 bg-secondary/20 px-4 py-3 text-xs text-muted-foreground sm:px-5">
         {isGuest
           ? "You're in the demo, so a sample plan for next week is already approved. With little history, the planner says so and relies on your settings instead of guessing habits."
           : "With little history, the planner says so and relies on your settings instead of guessing habits."}

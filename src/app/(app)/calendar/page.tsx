@@ -115,11 +115,11 @@ export default async function CalendarPage({
     <PageContainer size="wide">
       <PageHeader title="Calendar" />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_23rem]">
-        <section aria-label={`${format(monthStart, "MMMM yyyy")} calendar`}>
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_23rem]">
+        <section aria-label={`${format(monthStart, "MMMM yyyy")} calendar`} className="rounded-xl border border-border/80 bg-card p-4 shadow-xs sm:p-5">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-border/60 pb-4">
             <div>
-              <h2 className="text-title font-semibold">{format(monthStart, "MMMM yyyy")}</h2>
+              <h2 className="text-title font-semibold tracking-tight">{format(monthStart, "MMMM yyyy")}</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {formatMinutes(monthTotal)} studied · {plural(byDay.size, "study day")}
               </p>
@@ -135,7 +135,7 @@ export default async function CalendarPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 pb-1.5 text-center text-xs text-muted-foreground sm:gap-1.5" aria-hidden>
+          <div className="grid grid-cols-7 gap-1 pb-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:gap-1.5" aria-hidden>
             {WEEKDAYS.map((w) => <div key={w}>{w}</div>)}
           </div>
 
@@ -153,10 +153,10 @@ export default async function CalendarPage({
                     aria-label={`${format(day, "EEEE, MMMM d")}: ${minutes ? `${formatMinutes(minutes)} studied` : "no study"}${plannedMin ? `, ${formatMinutes(plannedMin)} planned` : ""}${isToday ? ", today" : ""}`}
                     aria-current={iso === selected ? "date" : undefined}
                     className={cn(
-                      "flex min-h-[4.5rem] flex-col justify-between rounded-md border p-1 text-xs transition-colors sm:min-h-[5.5rem] sm:p-2 lg:min-h-[6.5rem]",
+                      "flex min-h-[4.5rem] flex-col justify-between rounded-lg border border-border/70 p-1.5 text-xs transition-all duration-150 sm:min-h-[5.5rem] sm:p-2 lg:min-h-[6.25rem]",
                       HEAT[heatLevel(minutes)],
                       plannedMin > 0 && "border-dashed border-primary",
-                      iso === selected && "ring-2 ring-primary ring-offset-1 ring-offset-background",
+                      iso === selected && "ring-2 ring-primary ring-offset-1 ring-offset-card shadow-xs",
                     )}
                   >
                     <span className="flex items-start justify-between">
@@ -172,7 +172,7 @@ export default async function CalendarPage({
             })}
           </ol>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/60 pt-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-2">
               Time studied
               <span className="flex items-center gap-1.5">
@@ -192,13 +192,13 @@ export default async function CalendarPage({
           </div>
         </section>
 
-        <ScrollToDetail trigger={selected ?? month} label="Selected day" className="h-fit rounded-lg border bg-card xl:sticky xl:top-6">
+        <ScrollToDetail trigger={selected ?? month} label="Selected day" className="h-fit overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs xl:sticky xl:top-6">
           {selected ? (
-            <>
-              <div className="border-b p-4">
+            <div key={selected} className="section-fade">
+              <div className="border-b border-border/60 bg-secondary/20 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="text-sm font-semibold">{format(parseISO(selected), "EEEE, MMMM d, yyyy")}</h2>
+                    <h2 className="text-sm font-semibold tracking-tight">{format(parseISO(selected), "EEEE, MMMM d, yyyy")}</h2>
                     <p className="mt-0.5 text-xs text-muted-foreground">{summary}</p>
                   </div>
                   {selected <= today && (
@@ -210,7 +210,7 @@ export default async function CalendarPage({
                 {subjectChips.length > 0 && (
                   <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Subjects studied">
                     {subjectChips.map(({ subject, minutes }) => (
-                      <li key={subject?.id ?? "unknown"} className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-xs">
+                      <li key={subject?.id ?? "unknown"} className="inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-secondary/80 px-2 py-1 text-xs font-medium">
                         <span className="size-2 rounded-full" style={{ backgroundColor: subject?.color ?? "#999" }} aria-hidden />
                         {subject?.name ?? "Subject"}
                         <span className="tabular-nums text-muted-foreground">{formatMinutes(minutes)}</span>
@@ -221,13 +221,13 @@ export default async function CalendarPage({
               </div>
 
               {dayPlanned.length > 0 && (
-                <div className={cn("p-3", daySessions.length > 0 && "border-b")}>
-                  <h3 className="px-1 pb-2 text-xs text-muted-foreground">Planned</h3>
+                <div className={cn("p-3.5", daySessions.length > 0 && "border-b border-border/60")}>
+                  <h3 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Planned</h3>
                   <ul className="space-y-2">
                     {dayPlanned.map(({ item, used, status }) => {
                       const s = subjects.find((x) => x.id === item.subject_id);
                       return (
-                        <li key={item.id} className="rounded-md border border-dashed border-primary/60 px-3 py-2">
+                        <li key={item.id} className="rounded-lg border border-dashed border-primary/60 bg-accent/20 px-3 py-2 transition-colors hover:bg-accent/35">
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
                               <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: s?.color ?? "#999" }} aria-hidden />
@@ -255,8 +255,8 @@ export default async function CalendarPage({
 
               {daySessions.length > 0 && (
                 <div>
-                  {dayPlanned.length > 0 && <h3 className="px-4 pt-3 text-xs text-muted-foreground">Completed</h3>}
-                  <ul className="divide-y">
+                  {dayPlanned.length > 0 && <h3 className="px-4 pt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Completed</h3>}
+                  <ul className="divide-y divide-border/60">
                     {daySessions.map((s) => <SessionRow key={s.id} session={s} subjects={subjects} />)}
                   </ul>
                 </div>
@@ -267,7 +267,7 @@ export default async function CalendarPage({
                   {selected > today ? "This day hasn't happened yet." : "Nothing logged for this day."}
                 </p>
               )}
-            </>
+            </div>
           ) : (
             <p className="px-4 py-6 text-sm text-muted-foreground">Select a day to see its sessions.</p>
           )}
