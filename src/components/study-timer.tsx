@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, Square } from "lucide-react";
+import { Maximize2, Pause, Play, Square } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -181,6 +181,21 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
   // ---- running / paused
   const running = timer.status === "running";
   const ms = elapsedMs(timer, now + offset);
+  const isPomodoro = timer.mode === "pomodoro";
+  const isBreak = isPomodoro && (timer.phase === "short_break" || timer.phase === "long_break");
+
+  const phaseLabel = isPomodoro
+    ? timer.phase === "short_break"
+      ? "Short Break"
+      : timer.phase === "long_break"
+      ? "Long Break"
+      : running
+      ? "Focus · Running"
+      : "Focus · Paused"
+    : running
+    ? "Running"
+    : "Paused";
+
   return (
     <section aria-label="Study timer" className={shell}>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -188,7 +203,7 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             {dot}
             <span className="truncate font-medium text-foreground">{subject?.name ?? "Unknown subject"}</span>
-            <span aria-live="polite">· {running ? "Running" : "Paused"}</span>
+            <span aria-live="polite">· {phaseLabel}</span>
             {running && (
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -200,8 +215,14 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
             {clock(ms)}
           </p>
         </div>
-        <div className="flex gap-2">
-          {running ? (
+        <div className="flex items-center gap-2">
+          {isBreak ? (
+            <Link href="/focus">
+              <Button variant="outline" size="sm" className="gap-1.5 border-teal-500/40 text-teal-400 hover:bg-teal-500/10">
+                <Maximize2 className="size-3.5" aria-hidden="true" /> Open Focus
+              </Button>
+            </Link>
+          ) : running ? (
             <Button variant="outline" disabled={pending} onClick={() => act(() => timerPause())}>
               <Pause className="size-4" aria-hidden /> Pause
             </Button>

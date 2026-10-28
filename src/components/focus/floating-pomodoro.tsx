@@ -10,9 +10,10 @@ import {
   Square,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
+  timerFocusNextPhase,
   timerFocusSkipBreak,
   timerFocusStart,
   timerPause,
@@ -33,6 +34,37 @@ function formatClock(ms: number) {
   const s = totalSeconds % 60;
   const p = (n: number) => String(n).padStart(2, "0");
   return `${p(m)}:${p(s)}`;
+}
+
+function playFocusChime() {
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const t = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.frequency.setValueAtTime(523.25, t);
+    gain1.gain.setValueAtTime(0.12, t);
+    gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(t);
+    osc1.stop(t + 0.5);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.frequency.setValueAtTime(659.25, t + 0.12);
+    gain2.gain.setValueAtTime(0.12, t + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(t + 0.12);
+    osc2.stop(t + 0.7);
+  } catch {
+    // Autoplay audio blocked
+  }
 }
 
 interface FloatingPomodoroProps {
@@ -131,6 +163,27 @@ export function FloatingPomodoro({ userId, subjects }: FloatingPomodoroProps) {
     segmentStartedAt: timer?.segment_started_at ?? null,
     serverNowMs,
   });
+
+  // Automatic phase completion check for Pomodoro
+  const lastNotifiedPhaseRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (timer?.status !== "running" || timer?.mode !== "pomodoro" || !timer?.phase_started_at) return;
+
+    if (progress.isCapReached) {
+      const phaseKey = `${timer.phase}_${timer.phase_started_at}`;
+      if (lastNotifiedPhaseRef.current !== phaseKey) {
+        lastNotifiedPhaseRef.current = phaseKey;
+        playFocusChime();
+        startTransition(async () => {
+          const res = await timerFocusNextPhase({
+            expectedPhaseStartedAt: timer.phase_started_at!,
+            autoStartFocus: false,
+          });
+          if (res.timer) setTimer(res.timer);
+        });
+      }
+    }
+  }, [progress.isCapReached, timer]);
 
   // Action helpers
   const handleAction = (action: () => Promise<TimerResult>, onSuccess?: () => void) => {
