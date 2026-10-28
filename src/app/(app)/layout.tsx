@@ -4,13 +4,17 @@ import { LogOut } from "lucide-react";
 import { logout } from "@/actions/auth";
 import { AppNav } from "@/components/app-nav";
 import { Brand } from "@/components/brand";
+import { FloatingPomodoro } from "@/components/focus/floating-pomodoro";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getSubjects } from "@/lib/data/queries";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const subjects = await getSubjects().catch(() => []);
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
@@ -59,6 +63,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-card/85 backdrop-blur-md pb-[env(safe-area-inset-bottom)] lg:hidden">
         <AppNav variant="tabs" />
       </div>
+
+      <FloatingPomodoro userId={user.id} subjects={subjects} />
     </div>
   );
 }
