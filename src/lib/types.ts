@@ -14,6 +14,8 @@ export type Session = {
   ended_at: string | null;
   duration_minutes: number;
   notes: string | null;
+  objective?: string | null;
+  pomodoro_cycles?: number;
   created_at: string;
 };
 

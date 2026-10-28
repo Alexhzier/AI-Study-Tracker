@@ -1,5 +1,5 @@
 import { format, parseISO } from "date-fns";
-import { Pencil } from "lucide-react";
+import { Pencil, Sparkles, Target } from "lucide-react";
 import { DeleteSessionButton } from "@/components/delete-session-button";
 import { SessionDialog } from "@/components/session-dialog";
 import { Button } from "@/components/ui/button";
@@ -15,16 +15,29 @@ export function SessionRow({
       ? `${toLocalTime(session.started_at)}–${toLocalTime(session.ended_at)}`
       : null;
   const meta = [showDate ? format(parseISO(session.session_date), "MMM d") : null, times].filter(Boolean).join(" · ");
+  const cycles = session.pomodoro_cycles ?? 0;
 
   return (
     <li className="group flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-secondary/40">
       <span className="size-2.5 shrink-0 rounded-full ring-2 ring-transparent transition-transform group-hover:scale-110" style={{ backgroundColor: subject?.color ?? "#999" }} aria-hidden />
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-baseline gap-2 flex-wrap">
           <p className="truncate text-sm font-semibold text-foreground">{subject?.name ?? "Unknown subject"}</p>
           {meta && <span className="shrink-0 text-xs text-muted-foreground">{meta}</span>}
+          {cycles > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20">
+              <Sparkles className="size-2.5" aria-hidden="true" />
+              {cycles} {cycles === 1 ? "cycle" : "cycles"}
+            </span>
+          )}
         </div>
-        {session.notes && <p className="truncate text-xs text-muted-foreground">{session.notes}</p>}
+        {session.objective && (
+          <p className="truncate text-xs font-medium text-foreground/80 flex items-center gap-1 mt-0.5">
+            <Target className="size-3 text-emerald-500 shrink-0" aria-hidden="true" />
+            <span className="text-muted-foreground">Goal:</span> {session.objective}
+          </p>
+        )}
+        {session.notes && <p className="truncate text-xs text-muted-foreground mt-0.5">{session.notes}</p>}
       </div>
       <p className="w-16 shrink-0 text-right text-sm font-medium tabular-nums text-foreground">{formatMinutes(session.duration_minutes)}</p>
       <div className="flex shrink-0 gap-0.5 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">

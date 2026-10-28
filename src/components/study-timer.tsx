@@ -125,7 +125,16 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
     }
     return (
       <section aria-label="Study timer" className={shell}>
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Study timer</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Study timer</p>
+          <Link
+            href="/focus"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+          >
+            <Maximize2 className="size-3" aria-hidden="true" />
+            <span>Focus Mode</span>
+          </Link>
+        </div>
         <div className="flex flex-col gap-3">
           <div>
             <label htmlFor="timer-subject" className="sr-only">Subject</label>
@@ -133,9 +142,16 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
               {active.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-          <Button className="w-full" disabled={pending || !subjectId} onClick={() => act(() => timerStart(subjectId))}>
-            <Play className="size-4" aria-hidden /> Start timer
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button className="flex-1 cursor-pointer" disabled={pending || !subjectId} onClick={() => act(() => timerStart(subjectId))}>
+              <Play className="size-4" aria-hidden /> Start timer
+            </Button>
+            <Link href="/focus">
+              <Button variant="outline" className="gap-1.5 cursor-pointer">
+                <Maximize2 className="size-4" aria-hidden="true" /> Focus
+              </Button>
+            </Link>
+          </div>
         </div>
         {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
       </section>
@@ -234,6 +250,13 @@ export function StudyTimer({ subjects, userId }: { subjects: Subject[]; userId: 
           <Button variant="secondary" disabled={pending} onClick={() => act(() => timerStop())}>
             <Square className="size-4" aria-hidden /> Stop
           </Button>
+          {!isBreak && (
+            <Link href="/focus" title="Expand to fullscreen Focus Mode">
+              <Button variant="ghost" size="icon" className="size-9 text-muted-foreground hover:text-foreground cursor-pointer">
+                <Maximize2 className="size-4" aria-hidden="true" />
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
       {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}

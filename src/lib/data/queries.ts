@@ -50,7 +50,7 @@ export async function listSessions(opts: {
   const build = (f: number, t: number) => {
     let q = supabase
       .from("study_sessions")
-      .select("id,subject_id,session_date,started_at,ended_at,duration_minutes,notes,created_at")
+      .select("id,subject_id,session_date,started_at,ended_at,duration_minutes,notes,objective,pomodoro_cycles,created_at")
       .order("session_date", { ascending: false })
       .order("started_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
