@@ -54,7 +54,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] w-full max-w-4xl overflow-hidden p-0 sm:max-w-4xl border-border/80 bg-card/95 backdrop-blur-xl shadow-2xl">
+      <DialogContent className="max-h-[92vh] w-full max-w-4xl overflow-hidden p-0 sm:max-w-4xl border-border/80 bg-card/95 backdrop-blur-xl shadow-2xl">
         {/* Ambient Top Glow Line */}
         <div
           aria-hidden
@@ -168,22 +168,22 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
         </DialogHeader>
 
         {/* Scrollable Content Container with Seamless Tab Transitions */}
-        <div className="relative max-h-[calc(85vh-170px)] overflow-y-auto px-6 py-6 sm:px-8 custom-scrollbar">
+        <div className="relative max-h-[calc(90vh-175px)] overflow-y-auto px-6 py-6 sm:px-8 custom-scrollbar">
           {/* ========================================================================= */}
           {/* SECTION 1: OVERVIEW */}
           {/* ========================================================================= */}
           {activeSection === "overview" && (
             <div className="animate-in fade-in-50 zoom-in-[0.98] duration-300 space-y-6">
-              {/* 3D Interactive Hero Tilt Card */}
+              {/* 3D Interactive Hero Tilt Card with Prominently Enlarged Logo */}
               <TiltCard maxTilt={6} className="w-full">
-                <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-card via-card to-accent/20 p-6 sm:p-8 shadow-lg">
+                <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-card via-card to-accent/20 p-6 sm:p-8 shadow-xl">
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-primary/10 blur-3xl"
+                    className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-primary/15 blur-3xl"
                   />
 
                   <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                    <div className="space-y-3 max-w-xl">
+                    <div className="space-y-3 max-w-lg">
                       <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                         <Sparkles className="size-3.5" /> Intentional Learning Ecosystem
                       </div>
@@ -195,17 +195,17 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
                       </p>
                     </div>
 
-                    {/* Floating 3D Emblem Container */}
+                    {/* Prominently Enlarged 3D Glowing Emblem */}
                     <div
-                      style={{ transform: "translateZ(30px)" }}
-                      className="relative mx-auto flex size-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-[#18282b] to-[#0c1416] p-2 ring-1 ring-emerald-500/40 shadow-[0_15px_30px_-5px_rgba(13,122,110,0.4)] transition-transform duration-300 hover:scale-105"
+                      style={{ transform: "translateZ(35px)" }}
+                      className="relative mx-auto flex size-36 sm:size-44 md:size-48 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-[#18282b] to-[#0c1416] p-3 ring-2 ring-emerald-500/50 shadow-[0_0_40px_rgba(45,212,191,0.35)] transition-transform duration-300 hover:scale-105"
                     >
                       <Image
-                        src="/logo.png"
-                        alt="Project AI Study Tracker Logo"
-                        width={96}
-                        height={96}
-                        className="size-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+                        src="/logo-icon.png"
+                        alt="Project AI Study Tracker Official Emblem"
+                        width={200}
+                        height={200}
+                        className="size-full object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.7)]"
                         priority
                       />
                     </div>
@@ -290,7 +290,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
           )}
 
           {/* ========================================================================= */}
-          {/* SECTION 2: PROCESS, WHO IT'S FOR & TECH STACK */}
+          {/* SECTION 2: PROCESS, WHO IT'S FOR & TECH STACK (WITH OFFICIAL LOGOS) */}
           {/* ========================================================================= */}
           {activeSection === "process" && (
             <div className="animate-in fade-in-50 zoom-in-[0.98] duration-300 space-y-7">
@@ -333,7 +333,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
                 <ProcessFlowchart />
               </div>
 
-              {/* Tech Stack 3D Interactive Badge Grid */}
+              {/* Tech Stack 3D Interactive Badge Grid with Official Logos */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Code2 className="size-4.5 text-primary" />
@@ -342,44 +342,171 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-                  {[
-                    { name: "Next.js 15 (App Router)", cat: "Frontend Framework", desc: "React Server Components & streaming" },
-                    { name: "React 19 & TypeScript", cat: "Client Runtime", desc: "Strict type safety & optimistic state" },
-                    { name: "Tailwind CSS v4", cat: "Styling & Design Tokens", desc: "Emerald / teal palette & glassmorphism" },
-                    { name: "Supabase PostgreSQL", cat: "Database & Security Definer", desc: "Atomic timer RPCs & strict RLS" },
-                    { name: "Supabase Realtime", cat: "Multi-Device Sync", desc: "WebSocket subscription & multi-tab bus" },
-                    { name: "Web Audio API", cat: "Procedural Synthesis", desc: "Zero-asset Brownian, rain & white noise" },
-                    { name: "Spotify iFrame API", cat: "Circadian Music", desc: "Time-of-day study playlist curation" },
-                    { name: "Vercel AI SDK", cat: "Adaptive Intelligence", desc: "LLM weekly plan generation" },
-                    { name: "Recharts & date-fns", cat: "Analytics & Heatmaps", desc: "Session trends & timezone alignment" },
-                  ].map((tech) => (
-                    <div
-                      key={tech.name}
-                      className="group rounded-xl border border-border/70 bg-card p-3 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md"
-                    >
-                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">
-                        {tech.cat}
-                      </div>
-                      <div className="mt-1 font-semibold text-xs text-foreground group-hover:text-primary transition-colors">
-                        {tech.name}
-                      </div>
-                      <p className="mt-1 text-[11px] text-muted-foreground leading-snug">
-                        {tech.desc}
-                      </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {/* 1. Next.js 15 */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-black/60 border border-white/10 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 180 180" className="size-6 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="90" cy="90" r="90" fill="black" />
+                        <path d="M149.508 157.438L69.1478 54H54V125.979H66.9786V69.3659L139.999 164.845C143.333 162.614 146.509 160.137 149.508 157.438Z" fill="url(#next-g1)" />
+                        <rect x="115" y="54" width="12.9786" height="71.9786" fill="url(#next-g2)" />
+                        <defs>
+                          <linearGradient id="next-g1" x1="109" y1="116.5" x2="144.5" y2="160.5" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="white" />
+                            <stop offset="1" stopColor="white" stopOpacity="0" />
+                          </linearGradient>
+                          <linearGradient id="next-g2" x1="121" y1="54" x2="120.799" y2="106.875" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="white" />
+                            <stop offset="1" stopColor="white" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
                     </div>
-                  ))}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Frontend Framework</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Next.js 15 (App Router)</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">React Server Components & streaming</p>
+                    </div>
+                  </div>
+
+                  {/* 2. React 19 & TypeScript */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#20232a] border border-[#61dafb]/20 p-1.5 shadow-xs">
+                      <svg viewBox="-11.5 -10.23174 23 20.46348" className="size-6 shrink-0">
+                        <circle cx="0" cy="0" r="2.05" fill="#61DAFB" />
+                        <g stroke="#61DAFB" strokeWidth="1" fill="none">
+                          <ellipse rx="11" ry="4.2" />
+                          <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                          <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                        </g>
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Client Runtime</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">React 19 & TypeScript</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Strict type safety & optimistic state</p>
+                    </div>
+                  </div>
+
+                  {/* 3. Tailwind CSS v4 */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#0f172a] border border-[#38bdf8]/20 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="none">
+                        <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.335 6.182 14.974 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C10.335 13.382 8.974 12 6.001 12z" fill="#38BDF8" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Styling & Design Tokens</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Tailwind CSS v4</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Emerald / teal palette & glassmorphism</p>
+                    </div>
+                  </div>
+
+                  {/* 4. Supabase PostgreSQL */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#1c1c1c] border border-[#3ecf8e]/20 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="none">
+                        <path d="M21.362 9.354H12V.3a.3.3 0 0 0-.535-.19L.863 13.918a.3.3 0 0 0 .235.495H10.5v9.054a.3.3 0 0 0 .535.19l10.602-13.808a.3.3 0 0 0-.275-.495z" fill="#3ECF8E" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Database & Security Definer</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Supabase PostgreSQL</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Atomic timer RPCs & strict RLS</p>
+                    </div>
+                  </div>
+
+                  {/* 5. Supabase Realtime */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#112423] border border-teal-500/30 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="none" stroke="#2DD4BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+                        <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+                        <circle cx="12" cy="12" r="2.5" fill="#2DD4BF" />
+                        <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+                        <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Multi-Device Sync</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Supabase Realtime</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">WebSocket subscription & multi-tab bus</p>
+                    </div>
+                  </div>
+
+                  {/* 6. Web Audio API */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#271d0e] border border-amber-500/30 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="none" stroke="#F59E0B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 10v4" />
+                        <path d="M6 6v12" />
+                        <path d="M10 3v18" />
+                        <path d="M14 8v8" />
+                        <path d="M18 5v14" />
+                        <path d="M22 10v4" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Procedural Synthesis</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Web Audio API</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Zero-asset Brownian, rain & white noise</p>
+                    </div>
+                  </div>
+
+                  {/* 7. Spotify iFrame API */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#0e2114] border border-[#1db954]/30 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="#1DB954">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Circadian Music</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Spotify iFrame API</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Time-of-day study playlist curation</p>
+                    </div>
+                  </div>
+
+                  {/* 8. Vercel AI SDK */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-black border border-white/20 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-5 shrink-0" fill="none">
+                        <path d="M12 2L24 22H0L12 2Z" fill="#FFFFFF" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Adaptive Intelligence</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Vercel AI SDK</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">LLM weekly plan generation</p>
+                    </div>
+                  </div>
+
+                  {/* 9. Recharts & date-fns */}
+                  <div className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#1f192b] border border-purple-500/30 p-1.5 shadow-xs">
+                      <svg viewBox="0 0 24 24" className="size-6 shrink-0" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 3v18h18" />
+                        <path d="M18 9l-5 5-4-4-3 3" />
+                        <circle cx="18" cy="9" r="1.5" fill="#A78BFA" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">Analytics & Heatmaps</div>
+                      <div className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors">Recharts & date-fns</div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug">Session trends & timezone alignment</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {/* ========================================================================= */}
-          {/* SECTION 3: CREATOR & LINKS */}
+          {/* SECTION 3: CREATOR & LINKS (ALEXHZIER ASDAIN) */}
           {/* ========================================================================= */}
           {activeSection === "creator" && (
             <div className="animate-in fade-in-50 zoom-in-[0.98] duration-300 space-y-6">
-              {/* 3D Interactive Creator Profile Card */}
+              {/* 3D Interactive Creator Profile Card with Photo */}
               <TiltCard maxTilt={7} className="w-full">
                 <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-card via-card to-accent/25 p-6 sm:p-8 shadow-xl">
                   <div
@@ -389,13 +516,23 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
 
                   <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-start gap-4 sm:gap-5">
-                      {/* Avatar Badge with 3D Depth */}
+                      {/* Photo Avatar with 3D Depth */}
                       <div
-                        style={{ transform: "translateZ(25px)" }}
-                        className="relative grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/30 font-mono text-2xl font-black text-primary ring-2 ring-primary/40 shadow-md sm:size-20 sm:text-3xl"
+                        style={{ transform: "translateZ(30px)" }}
+                        className="relative size-20 sm:size-24 shrink-0 overflow-hidden rounded-2xl bg-[#0d1417] ring-2 ring-primary/60 shadow-[0_10px_25px_rgba(13,122,110,0.4)]"
                       >
-                        AI
-                        <span className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-card" />
+                        <Image
+                          src="/creator.jpg"
+                          alt="Alexhzier Asdain"
+                          width={96}
+                          height={96}
+                          className="size-full object-cover"
+                          priority
+                        />
+                        <span
+                          aria-label="Online Status"
+                          className="absolute bottom-1.5 right-1.5 size-3.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs"
+                        />
                       </div>
 
                       <div className="space-y-1.5">
@@ -403,7 +540,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
                           <User className="size-3.5" /> Project Creator & Lead Engineer
                         </div>
                         <h3 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                          Alex Ierasdain
+                          Alexhzier Asdain
                         </h3>
                         <p className="font-mono text-xs text-muted-foreground sm:text-sm">
                           @Alexhzier · Software Craftsman & Full-Stack Builder
@@ -440,6 +577,33 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
 
               {/* Creator Action Links */}
               <div className="grid gap-3.5 sm:grid-cols-3">
+                {/* Developer Portfolio */}
+                <a
+                  href="https://alexhzier-asdain-portfolio.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="grid size-9 place-items-center rounded-lg bg-secondary text-foreground group-hover:text-primary transition-colors">
+                        <Globe className="size-5" />
+                      </div>
+                      <ExternalLink className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                      Developer Portfolio
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Software engineering portfolio, featured web applications, and live case studies.
+                    </p>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1 font-mono text-[11px] font-semibold text-primary">
+                    <span>Visit Portfolio</span>
+                    <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </a>
+
                 {/* GitHub Repository */}
                 <a
                   href="https://github.com/Alexhzier/AI-Study-Tracker"
@@ -485,38 +649,11 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
                       GitHub Profile
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      View Alex&rsquo;s other open source projects, developer contributions, and code repositories.
+                      View open source contributions, repositories, and developer activity.
                     </p>
                   </div>
                   <div className="mt-3 flex items-center gap-1 font-mono text-[11px] font-semibold text-primary">
                     <span>@Alexhzier</span>
-                    <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </a>
-
-                {/* Creator Portfolio */}
-                <a
-                  href="https://github.com/Alexhzier"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card p-4 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:bg-card hover:shadow-md"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="grid size-9 place-items-center rounded-lg bg-secondary text-foreground group-hover:text-primary transition-colors">
-                        <Globe className="size-5" />
-                      </div>
-                      <ExternalLink className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                    <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                      Developer Portfolio
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Software engineering portfolio, system design case studies, and live production demos.
-                    </p>
-                  </div>
-                  <div className="mt-3 flex items-center gap-1 font-mono text-[11px] font-semibold text-primary">
-                    <span>Visit Portfolio</span>
                     <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
                   </div>
                 </a>
@@ -563,4 +700,3 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
     </Dialog>
   );
 }
-
