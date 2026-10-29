@@ -516,22 +516,15 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
 
                   <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-start gap-4 sm:gap-5">
-                      {/* Photo Avatar with 3D Depth */}
+                      {/* Default Avatar Badge with 3D Depth */}
                       <div
-                        style={{ transform: "translateZ(30px)" }}
-                        className="relative size-20 sm:size-24 shrink-0 overflow-hidden rounded-2xl bg-[#0d1417] ring-2 ring-primary/60 shadow-[0_10px_25px_rgba(13,122,110,0.4)]"
+                        style={{ transform: "translateZ(25px)" }}
+                        className="relative grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-600/30 font-mono text-2xl font-black text-primary ring-2 ring-primary/40 shadow-md sm:size-20 sm:text-3xl"
                       >
-                        <Image
-                          src="/creator.jpg"
-                          alt="Alexhzier Asdain"
-                          width={96}
-                          height={96}
-                          className="size-full object-cover"
-                          priority
-                        />
+                        AA
                         <span
                           aria-label="Online Status"
-                          className="absolute bottom-1.5 right-1.5 size-3.5 rounded-full bg-emerald-500 ring-2 ring-card shadow-xs"
+                          className="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-card shadow-xs"
                         />
                       </div>
 
