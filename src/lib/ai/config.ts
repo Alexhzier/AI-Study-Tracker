@@ -6,27 +6,69 @@ function int(v: string | undefined, fallback: number, min: number, max: number) 
 
 export type AiProvider = "openai" | "google";
 
-export function aiConfig() {
-  const googleKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY)?.trim();
-  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+function clean(v: string | undefined): string {
+  return (v ?? "").trim().replace(/^['"]|['"]$/g, "");
+}
 
-  const rawProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
+export function aiConfig() {
+  const googleKey =
+    clean(process.env.GOOGLE_GENERATIVE_AI_API_KEY) ||
+    clean(process.env.GEMINI_API_KEY) ||
+    clean(process.env.GOOGLE_API_KEY) ||
+    clean(process.env.GOOGLE_AI_API_KEY) ||
+    clean(process.env.NEXT_PUBLIC_GOOGLE_GENERATIVE_AI_API_KEY) ||
+    clean(process.env.NEXT_PUBLIC_GEMINI_API_KEY) ||
+    clean(process.env.NEXT_PUBLIC_GOOGLE_API_KEY);
+
+  const openaiKey =
+    clean(process.env.OPENAI_API_KEY) ||
+    clean(process.env.NEXT_PUBLIC_OPENAI_API_KEY);
+
+  const genericKey =
+    clean(process.env.AI_API_KEY) ||
+    clean(process.env.API_KEY);
+
+  // Detect if a Google key ("AIza...") was placed in OPENAI_API_KEY or AI_API_KEY
+  const effectiveGoogleKey =
+    googleKey ||
+    (openaiKey.startsWith("AIza") ? openaiKey : "") ||
+    (genericKey.startsWith("AIza") ? genericKey : "");
+
+  const effectiveOpenaiKey =
+    (!openaiKey.startsWith("AIza") ? openaiKey : "") ||
+    (!genericKey.startsWith("AIza") ? genericKey : "");
+
+  const rawProvider = clean(process.env.AI_PROVIDER).toLowerCase();
   const provider: AiProvider =
-    rawProvider === "google"
+    rawProvider === "google" || rawProvider === "gemini"
       ? "google"
       : rawProvider === "openai"
         ? "openai"
-        : googleKey && !openaiKey
+        : effectiveGoogleKey && !effectiveOpenaiKey
           ? "google"
-          : "openai";
+          : effectiveOpenaiKey
+            ? "openai"
+            : "google";
 
+  const apiKey = provider === "google" ? effectiveGoogleKey : effectiveOpenaiKey;
   const defaultModel = provider === "google" ? "gemini-2.5-flash" : "gpt-4o-mini";
-  const model = (process.env.AI_MODEL || process.env.OPENAI_MODEL)?.trim() || defaultModel;
-  const hasKey = provider === "google" ? Boolean(googleKey) : Boolean(openaiKey);
+  const rawModel = clean(process.env.AI_MODEL) || clean(process.env.OPENAI_MODEL);
+
+  const model =
+    !rawModel
+      ? defaultModel
+      : provider === "google" && /^(gpt-|o1|o3|o4)/i.test(rawModel)
+        ? defaultModel
+        : provider === "openai" && /^gemini-/i.test(rawModel)
+          ? defaultModel
+          : rawModel;
+
+  const hasKey = Boolean(apiKey);
   return {
     enabled: Boolean(hasKey && model),
     provider,
     model,
+    apiKey,
     /** Plan generations allowed per user in any rolling 24 hours. */
     dailyLimit: int(process.env.AI_DAILY_PLAN_LIMIT, 5, 1, 100),
     /** Plans each demo guest may generate in 24 hours. */

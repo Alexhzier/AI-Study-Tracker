@@ -1,5 +1,5 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import { getISODay, parseISO } from "date-fns";
 import type { aiConfig } from "./config";
@@ -76,9 +76,8 @@ function promptPayload(ctx: PlanningContext, shareNotes: boolean) {
 export async function generateDraft(ctx: PlanningContext, cfg: ReturnType<typeof aiConfig>) {
   const dates = Object.keys(ctx.capacity).sort();
   const schema = buildAiOutputSchema(ctx.subjects.map((s) => s.id), dates);
-  const google = createGoogleGenerativeAI({
-    apiKey: (process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY)?.trim(),
-  });
+  const google = createGoogleGenerativeAI({ apiKey: cfg.apiKey });
+  const openai = createOpenAI({ apiKey: cfg.apiKey });
 
   const { output, usage } = await generateText({
     model: cfg.provider === "google" ? google(cfg.model) : openai(cfg.model),
