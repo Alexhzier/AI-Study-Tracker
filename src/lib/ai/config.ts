@@ -10,6 +10,15 @@ function clean(v: string | undefined): string {
   return (v ?? "").trim().replace(/^['"]|['"]$/g, "");
 }
 
+function normalizeGoogleModel(raw: string, fallback: string): string {
+  if (!raw || /^(gpt-|o1|o3|o4)/i.test(raw)) return fallback;
+  const lower = raw.toLowerCase().trim();
+  const slug = lower.replace(/^google\s+/i, "").replace(/geminit/g, "gemini").replace(/\s+/g, "-");
+  if (slug === "gemini-3.1-flash-lite") return "gemini-3.1-flash-lite-preview";
+  if (slug.startsWith("gemini-")) return slug;
+  return raw;
+}
+
 export function aiConfig() {
   const googleKey =
     clean(process.env.GOOGLE_GENERATIVE_AI_API_KEY) ||
@@ -57,9 +66,9 @@ export function aiConfig() {
   const model =
     !rawModel
       ? defaultModel
-      : provider === "google" && /^(gpt-|o1|o3|o4)/i.test(rawModel)
-        ? defaultModel
-        : provider === "openai" && /^gemini-/i.test(rawModel)
+      : provider === "google"
+        ? normalizeGoogleModel(rawModel, defaultModel)
+        : /^gemini-/i.test(rawModel)
           ? defaultModel
           : rawModel;
 
