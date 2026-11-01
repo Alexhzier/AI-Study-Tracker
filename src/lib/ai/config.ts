@@ -7,14 +7,26 @@ function int(v: string | undefined, fallback: number, min: number, max: number) 
 export type AiProvider = "openai" | "google";
 
 export function aiConfig() {
-  const provider: AiProvider = process.env.AI_PROVIDER === "google" ? "google" : "openai";
-  const model = process.env.AI_MODEL ?? process.env.OPENAI_MODEL; // OPENAI_MODEL kept for compatibility
-  const hasKey =
-    provider === "google" ? Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY) : Boolean(process.env.OPENAI_API_KEY);
+  const googleKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY)?.trim();
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+
+  const rawProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
+  const provider: AiProvider =
+    rawProvider === "google"
+      ? "google"
+      : rawProvider === "openai"
+        ? "openai"
+        : googleKey && !openaiKey
+          ? "google"
+          : "openai";
+
+  const defaultModel = provider === "google" ? "gemini-2.5-flash" : "gpt-4o-mini";
+  const model = (process.env.AI_MODEL || process.env.OPENAI_MODEL)?.trim() || defaultModel;
+  const hasKey = provider === "google" ? Boolean(googleKey) : Boolean(openaiKey);
   return {
     enabled: Boolean(hasKey && model),
     provider,
-    model: model ?? "",
+    model,
     /** Plan generations allowed per user in any rolling 24 hours. */
     dailyLimit: int(process.env.AI_DAILY_PLAN_LIMIT, 5, 1, 100),
     /** Plans each demo guest may generate in 24 hours. */
