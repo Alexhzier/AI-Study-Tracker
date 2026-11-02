@@ -31,8 +31,14 @@ Next.js (App Router) · TypeScript · Tailwind v4 · Supabase (Postgres + Auth) 
 ## AI Study Planner
 1. Apply `supabase/migrations/20260102000000_ai_planner.sql` (SQL Editor -> paste -> Run).
 2. `npm install ai@^6 @ai-sdk/openai@^3 @ai-sdk/google@^3`
-3. Choose a provider in `.env.local` (`AI_PROVIDER=google` is free; see `.env.example`) and to your host's environment variables.
+3. Choose a provider in `.env.local` (`AI_PROVIDER=google` with `GOOGLE_GENERATIVE_AI_API_KEY` is free; see `.env.example`) and in your host's environment variables (e.g. Vercel).
 4. In the app: Planner -> Planner settings (availability, goal, priorities, exams), then Generate.
+
+### How Scheduling & Budget Allocation Works
+- **Weekly Goal as a Hard Budget:** Your `Weekly Goal` in Planner Settings serves as the maximum weekly budget cap (`budget = min(capacityTotal, weeklyGoal - loggedThisWeek)`). Once the AI reaches this total duration across the week, it stops scheduling additional time and leaves remaining days open to prevent overworking.
+- **Availability as a Maximum Ceiling:** Setting 2–3 hours of availability per day tells the model the maximum free window for that day; it is not a required quota to fill.
+- **Subject Targets & Exam Proximity:** Subjects with active weekly targets or imminent exams receive priority. Once a subject's target is fulfilled, extra sessions are not scheduled.
+- **To Fill Every Day of the Week:** In Planner Settings, raise your `Weekly Goal` to match or approximate your total available hours (e.g. 2 hours/day × 7 days = 14 hours/week). Alternatively, use the `+ Add` button on draft days to manually insert custom study blocks.
 
 Statistics are computed in code before the model is called; model output is validated against real
 subjects, plannable dates, daily availability and the weekly goal. Usage is metered per user in
